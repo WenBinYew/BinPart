@@ -11,7 +11,7 @@ import com.roughike.bottombar.OnMenuTabSelectedListener;
 public class MainActivity extends AppCompatActivity {
 
     BottomBar bottomBar;
-
+    int x;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
