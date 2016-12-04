@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "486603654143",
+    "firebase_url": "https://tartalk-840bf.firebaseio.com",
+    "project_id": "tartalk-840bf",
+    "storage_bucket": "tartalk-840bf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486603654143:android:1f1340ec09984d9f",
+        "android_client_info": {
+          "package_name": "com.example.han.tartalk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "486603654143-549dpo5hicg2723dlofft0rrose3t0be.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0oPzIlXT8cK_JRbeco_U5LJ3KcGYLf9Q"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

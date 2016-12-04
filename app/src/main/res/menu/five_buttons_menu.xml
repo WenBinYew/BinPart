@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/bottomBarItemOne"
+        android:enabled="true"
+        android:icon="@drawable/ic_home_black_24px"
+        android:title="@string/home"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/bottomBarItemTwo"
+        android:icon="@drawable/ic_search_black_24px"
+        android:enabled="true"
+        android:title="@string/search"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/bottomBarItemThree"
+        android:icon="@drawable/ic_create_black_24px"
+        android:enabled="true"
+        android:title="@string/post"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/bottomBarItemFour"
+        android:icon="@drawable/ic_favorite_black_24px"
+        android:enabled="true"
+        android:title="@string/favourite"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/bottomBarItemFive"
+        android:enabled="true"
+        android:icon="@drawable/ic_person_black_24px"
+        android:title="@string/profile"
+        app:showAsAction="always"/>
+
+</menu>
