@@ -1,9 +1,13 @@
 package com.example.han.tartalk;
 
 
+import android.content.Intent;
+import android.support.annotation.IntegerRes;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabSelectedListener;
 
@@ -12,12 +16,32 @@ public class MainActivity extends AppCompatActivity {
 
     BottomBar bottomBar;
 
+    private FirebaseAuth auth;
+    private FirebaseAuth.AuthStateListener authListener;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+ //     auth = FirebaseAuth.getInstance();
+
+//
+//
+//        authListener = new FirebaseAuth.AuthStateListener() {
+//            @Override
+//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+//                if(firebaseAuth.getCurrentUser() == null){
+////                    Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+////                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+////                    startActivity(loginIntent);
+//
+//                }
+//            }
+//        };
 
         bottomBar = BottomBar.attach(this, savedInstanceState);
         bottomBar.setItemsFromMenu(R.menu.five_buttons_menu, new OnMenuTabSelectedListener() {
@@ -45,5 +69,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        //auth.addAuthStateListener(authListener) ;
     }
 }
