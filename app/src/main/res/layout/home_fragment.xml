@@ -3,12 +3,18 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:text="Home fragments"
+
+    <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textSize="36sp"
-        android:id="@+id/HomeTextView"/>
+        android:id="@+id/rvPost"
+        android:layout_height="match_parent" />
+
+    <!--<TextView-->
+        <!--android:text="Home fragments"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:textSize="36sp"-->
+        <!--android:id="@+id/HomeTextView"/>-->
 
 
 </LinearLayout>

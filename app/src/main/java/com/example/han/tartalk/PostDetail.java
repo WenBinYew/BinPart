@@ -1,78 +1,50 @@
 package com.example.han.tartalk;
 
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-
-public class HomeFragment extends android.support.v4.app.Fragment {
-
-    private RecyclerView rvPost;
-    private CardView cvPost;
-    private ArrayList<Post> postList = new ArrayList<Post>();
+public class PostDetail extends AppCompatActivity {
+    private RecyclerView rvComment;
     private DatabaseReference database;
-    //private DatabaseReference databaseComments;
-    private static final String TAG = "HomeFragment";
+    private ArrayList<Comment> commentList = new ArrayList<Comment>();
+    private static final String TAG = "Post Detail Activity";
 
-    public HomeFragment() {
-
-
-    }
-
-
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.home_fragment, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_post_detail);
 
-        rvPost = (RecyclerView) v.findViewById(R.id.rvPost);
-        cvPost = (CardView) v.findViewById(R.id.cvPost);
-        database = FirebaseDatabase.getInstance().getReference().child("Posts");
-        //databaseComments = FirebaseDatabase.getInstance().getReference().child("Comments");
-
+        rvComment = (RecyclerView) findViewById(R.id.rvComment);
+        database = FirebaseDatabase.getInstance().getReference().child("Posts").child("comments");
         retrieve();
-        rvPost.setHasFixedSize(true);
-        rvPost.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        return v;
-
 
     }
 
     public void retrieve() {
-        postList = new ArrayList<>();
+        commentList = new ArrayList<>();
         database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 fetchData(dataSnapshot);
-                PostAdapter adapter = new PostAdapter(getContext());
-                //adapter.setData(postList);
-                //adapter.setDataForArray(postList);
+                CommentAdapter adapter = new CommentAdapter(PostDetail.this);
 
-                rvPost.setAdapter(adapter);
-
+                rvComment.setAdapter(adapter);
 //                if (getActivity() != null) {
 //                    View headerView = LayoutInflater.from(getActivity()).inflate(R.layout.testing, rvPost, false);
 //                    adapter.setHeaderView(headerView);
 //                }
-                adapter.setData(postList);
+                adapter.setData(commentList);
 
             }
 
@@ -80,7 +52,7 @@ public class HomeFragment extends android.support.v4.app.Fragment {
             public void onCancelled(DatabaseError databaseError) {
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
                 // [START_EXCLUDE]
-                Toast.makeText(getContext(), "Failed to load post.",
+                Toast.makeText(PostDetail.this, "Failed to load post.",
                         Toast.LENGTH_LONG).show();
             }
         });
@@ -88,11 +60,11 @@ public class HomeFragment extends android.support.v4.app.Fragment {
     }
 
     private void fetchData(DataSnapshot dataSnapShot) {
-        postList = new ArrayList<>();
+        commentList = new ArrayList<>();
         for (DataSnapshot ds : dataSnapShot.getChildren()) {
 
 
-            final Post post = ds.getValue(Post.class);
+            final Comment comment = ds.getValue(Comment.class);
 //            Query myComments = databaseComments.orderByChild(post.comments);
 //            myComments.addValueEventListener(new ValueEventListener() {
 //                @Override
@@ -107,11 +79,8 @@ public class HomeFragment extends android.support.v4.app.Fragment {
 //            });
             //post.likes = (int) ds.child("likes").getChildrenCount();
             //ds.child("likes").getChildren();
-            postList.add(post);
+            commentList.add(comment);
 
         }
-
     }
-
-
 }

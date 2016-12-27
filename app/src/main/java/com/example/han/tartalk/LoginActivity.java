@@ -1,5 +1,6 @@
 package com.example.han.tartalk;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private FirebaseAuth auth;
     private DatabaseReference database;
+    private ProgressDialog progress;
 
 
     @Override
@@ -40,10 +42,13 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = (Button) findViewById(R.id.btnLogin);
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference().child("Users");
+        progress = new ProgressDialog(this);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                progress.setMessage("Login in");
+                progress.show();
                 checkLogin();
             }
         });
@@ -54,14 +59,15 @@ public class LoginActivity extends AppCompatActivity {
         String email = emailField.getText().toString().trim();
         String password = passwordField.getText().toString().trim();
 
-        if(!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)){
-            auth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
+            auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-                    if(task.isSuccessful()){
+                    if (task.isSuccessful()) {
+                        progress.dismiss();
                         checkUserExist();
-                    }else{
-                        Toast.makeText(LoginActivity.this,"Error Login" ,Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Error Login", Toast.LENGTH_LONG).show();
                     }
                 }
             });
@@ -72,20 +78,23 @@ public class LoginActivity extends AppCompatActivity {
     private void checkUserExist() {
         final String user_id = auth.getCurrentUser().getUid();
 
+
         database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.hasChild(user_id)){
+                if (dataSnapshot.hasChild(user_id)) {
+
 
                     Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
                     mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(mainIntent);
 
-                }else{
-                    Toast.makeText(LoginActivity.this,"Error login" ,Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(LoginActivity.this, "Error login", Toast.LENGTH_LONG).show();
 
                 }
             }
+
 
             @Override
             public void onCancelled(DatabaseError databaseError) {

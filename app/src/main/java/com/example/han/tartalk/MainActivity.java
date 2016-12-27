@@ -20,28 +20,29 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener authListener;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
- //     auth = FirebaseAuth.getInstance();
 
-//
-//
-//        authListener = new FirebaseAuth.AuthStateListener() {
-//            @Override
-//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-//                if(firebaseAuth.getCurrentUser() == null){
-////                    Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
-////                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-////                    startActivity(loginIntent);
-//
-//                }
-//            }
-//        };
+        auth = FirebaseAuth.getInstance();
+
+
+        authListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (firebaseAuth.getCurrentUser() == null) {
+                    Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(loginIntent);
+
+                }
+            }
+        };
+
+        HomeFragment fragment = new HomeFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
 
         bottomBar = BottomBar.attach(this, savedInstanceState);
         bottomBar.setItemsFromMenu(R.menu.five_buttons_menu, new OnMenuTabSelectedListener() {
@@ -75,6 +76,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        //auth.addAuthStateListener(authListener) ;
+        auth.addAuthStateListener(authListener);
     }
 }
