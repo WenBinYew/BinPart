@@ -1,20 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_marginTop="10dp">
+
+    <ImageView
+        android:layout_width="42dp"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/right_angle1"
+        android:id="@+id/imageViewRightAngle1" />
+</LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        tools:context="com.example.han.profile.ProfileFragment"
+        android:weightSum="1">
+
+        <TextView
+            android:textAlignment="center"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/lblNickname"
+            android:layout_marginTop="15dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="80dp"
+            android:id="@+id/textViewLblNickname" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/nickname"
+            android:id="@+id/textViewNickname"
+            android:layout_marginStart="200dp"
+            android:layout_marginTop="15dp"
+            />
+
+        <TextView
+            android:text=":"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginStart="180dp"/>
+
+        <TextView
+            android:text="@string/post"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="55dp"
+            android:layout_marginStart="90dp"
+            android:id="@+id/textViewPost" />
+
+        <TextView
+            android:text="@string/lblPost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="55dp"
+            android:layout_marginStart="110dp"
+            android:id="@+id/textViewLblPost" />
+
+        <TextView
+            android:text="|"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="55dp"
+            android:layout_marginStart="180dp" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="330dp"
+            app:srcCompat="@drawable/right_angle2"
+            android:id="@+id/imageViewRightAngle2" />
+    </RelativeLayout>
+
+    <View
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@android:color/darker_gray"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="369dp"
+        android:id="@+id/listViewProfile" />
 
     <Button
-        android:text="Button"
+        android:text="Logout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/btnLogout"
-        />
-
-    <TextView
-        android:text="Profile fragments"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textSize="36sp" />
+        android:background="@color/colorPrimary"
+        android:textColor="@color/white"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
 
 </LinearLayout>

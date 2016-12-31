@@ -5,4 +5,13 @@
     <string name="post">Post</string>
     <string name="favourite">Favourite</string>
     <string name="profile">Profile</string>
+    <string name="nickname">Nickname</string>
+    <string name="lblNickname">Nickname</string>
+    <string name="lblPost">Post</string>
+    <string name="comment">Comment</string>
+    <string-array name="Profile">
+        <item>Change password</item>
+        <item>My posts</item>
+    </string-array>
+    <string name="title_activity_change_password">ChangePasswordActivity</string>
 </resources>

@@ -10,7 +10,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".SplashActivity"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,7 +21,30 @@
         </activity>
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".PostDetail"></activity>
+        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".ResetPasswordActivity"
+            android:label="Reset Password" />
+        <activity android:name=".MyHistoryActivity" />
+        <activity
+            android:name=".MyPostActivity"
+            android:label="My Post"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".MyCommentActivity"
+            android:label="My Comment"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".SignUpActivity"
+            android:label="Sign Up" />
+        <activity
+            android:name=".HomeActivity"
+            android:label="Home" />
+        <activity
+            android:name=".UploadedImageActivity"
+            android:label="Uploaded Image"
+            android:parentActivityName=".MainActivity" />
+        <activity android:name=".ChangePasswordActivity"></activity>
     </application>
 
 </manifest>

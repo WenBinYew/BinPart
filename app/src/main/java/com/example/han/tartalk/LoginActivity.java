@@ -2,13 +2,15 @@ package com.example.han.tartalk;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -21,15 +23,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener  {
 
-    private EditText emailField;
-    private EditText passwordField;
-    private Button btnLogin;
+    private Button buttonSignIn;
+    private Button buttonCancel;
+    private EditText editTextEmail;
+    private EditText editTextPassword;
+    private TextView textViewRegister;
+    private TextView textViewForgetPassword;
 
-    private FirebaseAuth auth;
+    private ProgressDialog progressDialog;
+    private FirebaseAuth firebaseAuth;
     private DatabaseReference database;
-    private ProgressDialog progress;
 
 
     @Override
@@ -37,58 +42,71 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        emailField = (EditText) findViewById(R.id.txtViewEmailLogin);
-        passwordField = (EditText) findViewById(R.id.txtViewPasswordLogin);
-        btnLogin = (Button) findViewById(R.id.btnLogin);
-        auth = FirebaseAuth.getInstance();
-        database = FirebaseDatabase.getInstance().getReference().child("Users");
-        progress = new ProgressDialog(this);
+//        if(firebaseAuth.getCurrentUser() != null){
+//            finish();
+//            startActivity(new Intent(getApplicationContext(),MainActivity.class));
+//        }
 
-        btnLogin.setOnClickListener(new View.OnClickListener() {
+        progressDialog = new ProgressDialog(this);
+
+
+        buttonSignIn = (Button)findViewById(R.id.buttonSignIn);
+        editTextEmail = (EditText)findViewById(R.id.editTextEmail);
+        editTextPassword = (EditText)findViewById(R.id.editTextPassword);
+        textViewRegister = (TextView)findViewById(R.id.textViewRegister);
+        textViewForgetPassword = (TextView)findViewById(R.id.textViewForgetPassword);
+        buttonSignIn.setOnClickListener(this);
+        textViewRegister.setOnClickListener(this);
+        textViewForgetPassword.setOnClickListener(this);
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance().getReference().child("Users");
+    }
+
+    private void userLogin(){
+        final String email = editTextEmail.getText().toString().trim();
+        String password = editTextPassword.getText().toString().trim();
+
+        if(TextUtils.isEmpty(email)){
+            //email is empty
+            Toast.makeText(this, "Please enter email", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(TextUtils.isEmpty(password)){
+            //password is empty
+            Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();
+
+        firebaseAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
-            public void onClick(View view) {
-                progress.setMessage("Login in");
-                progress.show();
-                checkLogin();
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()) {
+                    progressDialog.setMessage("Login to TarTalk.");
+                    progressDialog.show();
+                    progressDialog.dismiss();
+                    finish();
+
+                }else{
+                    Toast.makeText(LoginActivity.this, "Fail to Login. please try again. ", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                }
             }
         });
     }
 
-    private void checkLogin() {
-
-        String email = emailField.getText().toString().trim();
-        String password = passwordField.getText().toString().trim();
-
-        if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
-            auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        progress.dismiss();
-                        checkUserExist();
-                    } else {
-                        Toast.makeText(LoginActivity.this, "Error Login", Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
-        }
-
-    }
-
     private void checkUserExist() {
-        final String user_id = auth.getCurrentUser().getUid();
-
+        final String user_id = firebaseAuth.getCurrentUser().getUid();
 
         database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(user_id)) {
-
-
                     Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
                     mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(mainIntent);
-
                 } else {
                     Toast.makeText(LoginActivity.this, "Error login", Toast.LENGTH_LONG).show();
 
@@ -101,6 +119,23 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
-
     }
+            @Override
+        public void onClick(View view) {
+            if(view == buttonSignIn){
+                userLogin();
+
+            }
+            if(view == textViewRegister){
+                //will open login activity activity
+                finish();
+                startActivity(new Intent(this,SignUpActivity.class));
+            }
+            if(view == textViewForgetPassword){
+                finish();
+                startActivity(new Intent(this,ResetPasswordActivity.class));
+            }
+
+        }
 }
+
