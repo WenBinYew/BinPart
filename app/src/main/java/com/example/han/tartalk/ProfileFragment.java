@@ -84,12 +84,6 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
                     case 1:
                         startActivity(new Intent(getActivity(), MyHistoryActivity.class));
                         break;
-//                    case 2:
-//                        startActivity(new Intent(getActivity(), UploadedImageActivity.class));
-//                        break;
-//                    case 3:
-//                        startActivity(new Intent(getActivity(), MyCommentActivity.class));
-//                        break;
                 }
             };
         });

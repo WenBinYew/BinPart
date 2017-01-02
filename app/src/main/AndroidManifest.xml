@@ -27,10 +27,6 @@
             android:label="Reset Password" />
         <activity android:name=".MyHistoryActivity" />
         <activity
-            android:name=".MyPostActivity"
-            android:label="My Post"
-            android:parentActivityName=".MainActivity" />
-        <activity
             android:name=".MyCommentActivity"
             android:label="My Comment"
             android:parentActivityName=".MainActivity" />
