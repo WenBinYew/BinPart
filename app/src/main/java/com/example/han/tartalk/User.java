@@ -16,7 +16,7 @@ public class User implements Serializable {
     public Map<String, Object> postID;
 
 
-
+    public User(){}
 
 
     public User(String Image, String Name) {
@@ -25,8 +25,6 @@ public class User implements Serializable {
 
     }
 
-    public User() {
-    }
 
 
 }

@@ -90,7 +90,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     DatabaseReference current_user_db = databaseReference.child(user_id);
                     current_user_db.child("Name").setValue(name);
                     current_user_db.child("Image").setValue("default");
-                    Toast.makeText(SignUpActivity.this, "Registered "+ user +" Successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignUpActivity.this, "Registered Successfully", Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
                     finish();
                     startActivity(new Intent(getApplicationContext(),MainActivity.class));
@@ -112,8 +112,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         }
         if(view == textViewSignIn){
             //will open login activity activity
-            Intent intent = new Intent(this,LoginActivity.class);
-            startActivity(intent);
+//            Intent intent = new Intent(this,LoginActivity.class);
+//            startActivity(intent);
+            finish();
         }
     }
 }

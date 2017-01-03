@@ -45,7 +45,6 @@ public class HomeFragment extends android.support.v4.app.Fragment {
         rvPost = (RecyclerView) v.findViewById(R.id.rvPost);
         cvPost = (CardView) v.findViewById(R.id.cvPost);
         database = FirebaseDatabase.getInstance().getReference().child("Posts");
-        //databaseComments = FirebaseDatabase.getInstance().getReference().child("Comments");
 
         retrieve();
         rvPost.setHasFixedSize(true);
@@ -62,7 +61,7 @@ public class HomeFragment extends android.support.v4.app.Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 fetchData(dataSnapshot);
-                PostAdapter adapter = new PostAdapter(getContext());
+                  PostAdapter adapter = new PostAdapter(getContext());
                 //adapter.setData(postList);
                 //adapter.setDataForArray(postList);
 
@@ -93,20 +92,6 @@ public class HomeFragment extends android.support.v4.app.Fragment {
 
 
             final Post post = ds.getValue(Post.class);
-//            Query myComments = databaseComments.orderByChild(post.comments);
-//            myComments.addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    post.commentsCount = (int) dataSnapshot.getChildrenCount();
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
-            //post.likes = (int) ds.child("likes").getChildrenCount();
-            //ds.child("likes").getChildren();
             postList.add(post);
 
         }

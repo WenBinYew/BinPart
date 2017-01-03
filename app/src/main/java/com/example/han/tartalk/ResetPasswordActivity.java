@@ -64,7 +64,7 @@ public class ResetPasswordActivity extends AppCompatActivity implements View.OnC
             resetpassword();
         }if(view == buttonBack){
             finish();
-            startActivity(new Intent(this,LoginActivity.class));
+//            startActivity(new Intent(this,LoginActivity.class));
         }if(view == textViewResent){
             resetpassword();
          }

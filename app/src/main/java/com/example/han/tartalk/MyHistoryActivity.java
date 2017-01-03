@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -12,65 +13,99 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 public class MyHistoryActivity extends AppCompatActivity {
 
-    private RecyclerView myHistoryRecycleView;
-    private DatabaseReference mDatabase;
+    private RecyclerView rvPost;
+    private CardView cvPost;
+    private DatabaseReference mDatabase,pDatabase;
+    private ArrayList<Post> postList = new ArrayList<Post>();;
+    private ArrayList<String> postIDList;
+    private FirebaseAuth mAuth;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_history);
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("Posts");
 
-        myHistoryRecycleView = (RecyclerView)findViewById(R.id.myHistoryRecycleView);
-        myHistoryRecycleView.setHasFixedSize(true);
-        myHistoryRecycleView.setLayoutManager(new LinearLayoutManager(this));
+        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
 
 
+        rvPost = (RecyclerView)findViewById(R.id.rvPost);
+        cvPost = (CardView)findViewById(R.id.cvPost);
+        retrieve();
+        rvPost.setHasFixedSize(true);
+        rvPost.setLayoutManager(new LinearLayoutManager(this));
 
-
-}
-
-
+    }
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseRecyclerAdapter<recycleViewAdapter,ViewHolder> firebaseRecycleAdapter = new FirebaseRecyclerAdapter<recycleViewAdapter,ViewHolder>(recycleViewAdapter.class, R.layout.history_row,ViewHolder.class,mDatabase) {
 
-            @Override
-            protected void populateViewHolder(ViewHolder viewHolder, recycleViewAdapter model, final int position) {
-
-                viewHolder.setTitle(model.getTitle());
-                viewHolder.setContent(model.getContent());
-                viewHolder.setDate(model.getDate());
-                viewHolder.setNickname(model.getName());
-                viewHolder.setImage(getApplicationContext(),model.getImage());
-                viewHolder.view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        /*if(position == 1){
-
-                            startActivity(new Intent(view.getContext(),LoginActivity.class));
-                        }*/
-                        Toast.makeText(MyHistoryActivity.this,"Position : " + position , Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-
-
-        };
-
-
-
-        myHistoryRecycleView.setAdapter(firebaseRecycleAdapter);
 
 }
+
+    public void retrieve() {
+        postList = new ArrayList<>();
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                fetchData(dataSnapshot);
+                findData();
+
+                PostAdapter adapter = new PostAdapter(getParent());
+
+                adapter.setData(postList);
+                rvPost.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void fetchData(DataSnapshot dataSnapShot) {
+        postIDList = new ArrayList<>();
+        postList = new ArrayList<>();
+            final User post = dataSnapShot.getValue(User.class);
+            for(Object value : post.postID.values()){
+                postIDList.add(value.toString());
+            }
+    }
+    public void findData(){
+        for(int i = 0; i<postIDList.size(); i++){
+            final int finalI1 = i;
+        pDatabase = FirebaseDatabase.getInstance().getReference().child("Posts").child(postIDList.get(finalI1));
+            pDatabase.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    final Post post = dataSnapshot.getValue(Post.class);
+                    postList.add(post);
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+      }
+
+    }
 
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -78,7 +113,6 @@ public class MyHistoryActivity extends AppCompatActivity {
             case android.R.id.home:
                 finish();
                 getSupportFragmentManager().popBackStack("ProfileFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
                 return true;
 
             default:
@@ -91,45 +125,6 @@ public class MyHistoryActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        View view;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            view = itemView;
-        }
-
-        public void setNickname(String Name){
-            TextView textViewNickname;
-            textViewNickname = (TextView)itemView.findViewById(R.id.textViewNickname);
-            textViewNickname.setText(Name);
-
-        }
-        public void setTitle(String Title){
-            TextView textViewTitle;
-            textViewTitle = (TextView)itemView.findViewById(R.id.textViewTitle);
-            textViewTitle.setText(Title);
-
-        }
-        public void setContent(String Content){
-            TextView textViewContent;
-            textViewContent = (TextView)itemView.findViewById(R.id.textViewContent);
-            textViewContent.setText(Content);
-
-        }
-        public void setDate(String Date){
-            TextView textViewDate;
-            textViewDate = (TextView)itemView.findViewById(R.id.textViewDate);
-            textViewDate.setText(Date);
-        }
-
-        public void setImage(Context c , String Image){
-            ImageView imageHistory;
-            imageHistory = (ImageView)itemView.findViewById(R.id.imageHistory);
-            Picasso.with(c).load(Image).into(imageHistory);
-
-        }
-    }
 
 }

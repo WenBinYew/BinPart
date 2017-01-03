@@ -26,15 +26,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
-/**
- * Created by han on 21/12/2016.
- */
 
 class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder> {
 
     private DatabaseReference databaseComments;
+
+
 
     public PostAdapter(Context context) {
 
@@ -160,7 +160,7 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
                             final Calendar c = Calendar.getInstance();
                             SimpleDateFormat sdf = new SimpleDateFormat("dd:MMMM:yyyy HH:mm:ss a");
                             final String strDate = sdf.format(c.getTime());
-                                Comment comment = new Comment();
+                            Comment comment = new Comment();
                             comment.comment = txtComment.getText().toString();
                             comment.date = strDate;
                             comment.uid = getData().get(position).uid;
@@ -254,6 +254,11 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
 
     }
 
+    public void setFilter(ArrayList<Post> postList) {
+        postList = new ArrayList<>();
+        postList.addAll(postList);
+        notifyDataSetChanged();
+    }
     //View Holder class
     public static class PostViewHolder extends RecyclerView.ViewHolder {
 

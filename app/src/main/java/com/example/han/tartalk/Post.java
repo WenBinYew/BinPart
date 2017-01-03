@@ -40,5 +40,9 @@ public class Post implements Serializable {
     public Post() {
     }
 
+    public String getTitle() {
+        return title;
+    }
+
 
 }

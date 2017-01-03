@@ -66,6 +66,7 @@ public class PostFragment extends android.support.v4.app.Fragment {
     private TextView textViewRegister;
     private TextView textViewForgetPassword;
     private FirebaseAuth.AuthStateListener authListener;
+    private AlertDialog alertDialog;
 
     @Nullable
     @Override
@@ -90,23 +91,45 @@ public class PostFragment extends android.support.v4.app.Fragment {
                     buttonCancel = (Button)promptsView.findViewById(R.id.buttonCancel);
 
                     final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                    alertDialog = alertDialogBuilder.create();
+
+
                     alertDialogBuilder.setCancelable(false);
+                    alertDialog.setCancelable(false);
+                    textViewRegister.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            startActivity(new Intent(getActivity(),SignUpActivity.class));
+                        }
+                    });
+                    textViewForgetPassword.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            startActivity(new Intent(getActivity(),ResetPasswordActivity.class));
+                        }
+                    });
                     buttonSignIn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
+
                             chkLogin();
+
 
                         }
                     });
                     buttonCancel.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            startActivity(new Intent(getActivity(), MainActivity.class));
+
+                            alertDialog.dismiss();
+                            HomeFragment fragment = new HomeFragment();
+                            getFragmentManager().beginTransaction().replace(R.id.main_container,new HomeFragment()).commit();
+
                         }
                     });
+                    alertDialog.setView(promptsView);
+                    alertDialog.show();
 
-                    alertDialogBuilder.setView(promptsView);
-                    alertDialogBuilder.show();
 
 
 //                    alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -166,12 +189,12 @@ public class PostFragment extends android.support.v4.app.Fragment {
         if(TextUtils.isEmpty(email)){
             //email is empty
             Toast.makeText(getActivity(), "Please enter email", Toast.LENGTH_SHORT).show();
-            return;
+            return ;
         }
         if(TextUtils.isEmpty(password)){
             //password is empty
             Toast.makeText(getActivity(), "Please enter password", Toast.LENGTH_SHORT).show();
-            return;
+            return ;
         }
         progressDialog.setMessage("Loading...");
         progressDialog.show();
@@ -183,7 +206,7 @@ public class PostFragment extends android.support.v4.app.Fragment {
                     progressDialog.setMessage("Login to TarTalk.");
                     progressDialog.show();
                     progressDialog.dismiss();
-
+                    alertDialog.dismiss();
 
                 }else{
                     Toast.makeText(getActivity(), "Fail to Login. please try again. ", Toast.LENGTH_SHORT).show();
@@ -193,29 +216,29 @@ public class PostFragment extends android.support.v4.app.Fragment {
         });
     }
 
-    private void checkUserExist() {
-        final String user_id = auth.getCurrentUser().getUid();
-
-        database.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild(user_id)) {
-                    Intent mainIntent = new Intent(getActivity(), MainActivity.class);
-                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(mainIntent);
-                } else {
-                    Toast.makeText(getActivity(), "Error login", Toast.LENGTH_LONG).show();
-
-                }
-            }
-
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
+//    private void checkUserExist() {
+//        final String user_id = auth.getCurrentUser().getUid();
+//
+//        database.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if (dataSnapshot.hasChild(user_id)) {
+//                    Intent mainIntent = new Intent(getActivity(), MainActivity.class);
+//                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                    startActivity(mainIntent);
+//                } else {
+//                    Toast.makeText(getActivity(), "Error login", Toast.LENGTH_LONG).show();
+//
+//                }
+//            }
+//
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+//    }
 
     private void startPosting() {
 

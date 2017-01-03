@@ -8,18 +8,14 @@ import java.util.Map;
 
 public class recycleViewAdapter {
 
-    public String Name,Title,Image,Date,Content;
+    public String Name,Image;
     public Map<String, Object> postID;
 
     public recycleViewAdapter(){}
 
-    public recycleViewAdapter(String name, String title, String image, String date, String content) {
+    public recycleViewAdapter(String name, String image) {
         Name = name;
-        Title = title;
         Image = image;
-        Date = date;
-        Content = content;
-
     }
 
 
@@ -27,21 +23,8 @@ public class recycleViewAdapter {
         return Name;
     }
 
-    public String getTitle() {
-        return Title;
-    }
-
     public String getImage() {
         return Image;
     }
-
-    public String getDate() {
-        return Date;
-    }
-
-    public String getContent() {
-        return Content;
-    }
-
 
 }

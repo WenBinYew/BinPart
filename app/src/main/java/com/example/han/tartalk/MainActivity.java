@@ -54,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
                     HomeFragment fragment = new HomeFragment();
                     getSupportFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
                 } else if (menuItemId == R.id.bottomBarItemTwo) {
-                    SearchFragment fragment = new SearchFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
+                    //SearchFragment fragment = new SearchFragment();
+                   // getSupportFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
                 } else if (menuItemId == R.id.bottomBarItemThree) {
 //                    if(userLogin==false){
 //                        userLogin = true;

@@ -40,6 +40,9 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
     private EditText editTextNewPasswordConfirm;
     private EditText editTextNewPassword;
     private FirebaseAuth firebaseAuth;
+    private Button buttonOk;
+    private Button buttonCancel;
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,18 +63,32 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setView(promptsView);
         editTextOldPassword = (EditText) promptsView.findViewById(R.id.editTextOldPassword);
+        buttonOk = (Button)promptsView.findViewById(R.id.buttonOk);
+        buttonCancel = (Button)promptsView.findViewById(R.id.buttonCancel);
+        alertDialog = alertDialogBuilder.create();
 
-        alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(final DialogInterface dialog, int id) {
+        alertDialogBuilder.setCancelable(false);
+        alertDialog.setCancelable(false);
+        alertDialog.setView(promptsView);
+        alertDialog.show();
+
+        buttonOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 chkPassword();
             }
-        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
+        });
+        buttonCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
                 finish();
+                alertDialog.dismiss();
+
             }
         });
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
+
+
     }
 
     private void chgPassword() {
@@ -117,17 +134,24 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
         progressDialog.setMessage("Loading...");
         progressDialog.show();
         final String oldPassword = editTextOldPassword.getText().toString();
+        if(TextUtils.isEmpty(oldPassword)){
+            //password is empty
+            Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();
+            progressDialog.dismiss();
+            return ;
+        }
         firebaseAuth.signInWithEmailAndPassword(firebaseAuth.getCurrentUser().getEmail(), oldPassword).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     Toast.makeText(ChangePasswordActivity.this, "Correct password ", Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
+                    alertDialog.dismiss();
                 } else {
                     progressDialog.dismiss();
                     Toast.makeText(ChangePasswordActivity.this, "Password incorrect. ", Toast.LENGTH_SHORT).show();
-                    finish();
-                    startActivity(new Intent(getApplicationContext(), ChangePasswordActivity.class));
+//                    finish();
+//                    startActivity(new Intent(getApplicationContext(), ChangePasswordActivity.class));
 
                 }
             }
