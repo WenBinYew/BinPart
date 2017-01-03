@@ -37,6 +37,9 @@
             android:name=".HomeActivity"
             android:label="Home" />
         <activity
+            android:name=".PostDetail"
+            android:label="Home" />
+        <activity
             android:name=".UploadedImageActivity"
             android:label="Uploaded Image"
             android:parentActivityName=".MainActivity" />

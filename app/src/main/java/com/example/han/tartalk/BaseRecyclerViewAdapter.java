@@ -38,13 +38,13 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
         return mList;
     }
 
-    public void setData(T[] list) {
-        ArrayList<T> arrayList = new ArrayList<>(list.length);
-        for (T t : list) {
-            arrayList.add(t);
-        }
-        setData(arrayList);
-    }
+//    public void setData(T[] list) {
+//        ArrayList<T> arrayList = new ArrayList<>(list.length);
+//        for (T t : list) {
+//            arrayList.add(t);
+//        }
+//        setData(arrayList);
+//    }
 
 
     public void addData(int position, T item) {

@@ -50,7 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/txtViewDateComment"
-               android:layout_marginLeft="26dp"
+                android:layout_marginLeft="26dp"
                 android:layout_centerVertical="true"
                 android:layout_alignParentStart="true"
                 android:layout_marginStart="29dp" />
@@ -60,10 +60,9 @@
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 android:layout_marginLeft="5dp"
-                android:src="@drawable/ic_dot"
                 android:layout_centerVertical="true"
                 android:layout_toEndOf="@+id/txtViewDateComment" />
-
+            <!--android:src="@drawable/ic_dot"-->
             <TextView
                 android:id="@+id/txtViewLikeCountComment"
                 android:layout_width="wrap_content"
@@ -93,10 +92,9 @@
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 android:layout_marginLeft="5dp"
-                android:src="@drawable/ic_dot"
                 android:layout_alignTop="@+id/imageDot"
                 android:layout_toEndOf="@+id/txtViewLikeCountComment" />
-
+            <!--android:src="@drawable/ic_dot"-->
             <Button
                 android:id="@+id/btnLikeComment"
                 android:layout_width="wrap_content"
