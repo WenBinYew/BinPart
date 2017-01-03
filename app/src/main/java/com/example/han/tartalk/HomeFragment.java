@@ -2,6 +2,7 @@ package com.example.han.tartalk;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,6 +27,7 @@ public class HomeFragment extends android.support.v4.app.Fragment {
 
     private RecyclerView rvPost;
     private CardView cvPost;
+    private SwipeRefreshLayout swipeRefresh;
     private ArrayList<Post> postList = new ArrayList<Post>();
     private DatabaseReference database;
     //private DatabaseReference databaseComments;
@@ -39,26 +41,35 @@ public class HomeFragment extends android.support.v4.app.Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.home_fragment, container, false);
 
         rvPost = (RecyclerView) v.findViewById(R.id.rvPost);
         cvPost = (CardView) v.findViewById(R.id.cvPost);
         database = FirebaseDatabase.getInstance().getReference().child("Posts");
+        swipeRefresh = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefresh);
         //databaseComments = FirebaseDatabase.getInstance().getReference().child("Comments");
 
         retrieve();
         rvPost.setHasFixedSize(true);
         rvPost.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+
+            @Override
+            public void onRefresh() {
+                retrieve();
+
+            }
+        });
+
         return v;
-
-
     }
+
 
     public void retrieve() {
         postList = new ArrayList<>();
-        database.addValueEventListener(new ValueEventListener() {
+        database.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 fetchData(dataSnapshot);
@@ -73,6 +84,7 @@ public class HomeFragment extends android.support.v4.app.Fragment {
 //                    adapter.setHeaderView(headerView);
 //                }
                 adapter.setData(postList);
+                swipeRefresh.setRefreshing(false);
 
             }
 
@@ -93,21 +105,9 @@ public class HomeFragment extends android.support.v4.app.Fragment {
 
 
             final Post post = ds.getValue(Post.class);
-//            Query myComments = databaseComments.orderByChild(post.comments);
-//            myComments.addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    post.commentsCount = (int) dataSnapshot.getChildrenCount();
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
-            //post.likes = (int) ds.child("likes").getChildrenCount();
-            //ds.child("likes").getChildren();
+
             postList.add(post);
+
 
         }
 

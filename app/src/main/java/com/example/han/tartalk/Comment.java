@@ -12,6 +12,7 @@ public class Comment {
     public String uid;
     public String date;
     public String name;
+    public String id;
     public Map<String, Object> likes;
     public Map<String, Object> dislikes;
 

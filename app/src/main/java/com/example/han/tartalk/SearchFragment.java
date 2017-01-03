@@ -10,6 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+import android.app.SearchManager;
+import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -26,7 +29,9 @@ public class SearchFragment extends android.support.v4.app.Fragment {
 
     private RecyclerView searchPost;
     private CardView cvPost;
+    private SearchView searchView;
     private ArrayList<Post> postList = new ArrayList<Post>();
+    private ArrayList<Post> postListSearch = new ArrayList<Post>();
     private DatabaseReference database;
     //private DatabaseReference databaseComments;
     private static final String TAG = "HomeFragment";
@@ -42,6 +47,9 @@ public class SearchFragment extends android.support.v4.app.Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.search_fragment, container, false);
 
+
+        searchView = (SearchView) v.findViewById(R.id.searchView);
+
         searchPost = (RecyclerView) v.findViewById(R.id.searchPost);
         cvPost = (CardView) v.findViewById(R.id.cvPost);
         database = FirebaseDatabase.getInstance().getReference().child("Posts");
@@ -50,6 +58,47 @@ public class SearchFragment extends android.support.v4.app.Fragment {
         retrieve();
         searchPost.setHasFixedSize(true);
         searchPost.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                postListSearch.clear();
+                String userQuery = query.toString().toLowerCase();
+                for(Post postArr : postList){
+                    final String text = postArr.content.toString().toLowerCase();
+
+                    if(text.contains(userQuery)){
+
+                        postListSearch.add(postArr);
+                    }
+                }
+
+                final PostAdapter adapter = new PostAdapter(getContext());
+                searchPost.setAdapter(adapter);
+                adapter.setData(postListSearch);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                postListSearch.clear();
+                String query = newText.toString().toLowerCase();
+               // String query = searchView.getQuery().toString().toLowerCase();
+                for(Post postArr : postList){
+                    final String text = postArr.content.toString().toLowerCase();
+
+                    if(text.contains(query)){
+
+                        postListSearch.add(postArr);
+                    }
+                }
+
+                final PostAdapter adapter = new PostAdapter(getContext());
+                searchPost.setAdapter(adapter);
+                adapter.setData(postListSearch);
+                return true;
+            }
+        });
 
         return v;
 
@@ -62,7 +111,7 @@ public class SearchFragment extends android.support.v4.app.Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 fetchData(dataSnapshot);
-                PostAdapter adapter = new PostAdapter(getContext());
+                final PostAdapter adapter = new PostAdapter(getContext());
                 //adapter.setData(postList);
                 //adapter.setDataForArray(postList);
 
@@ -112,6 +161,8 @@ public class SearchFragment extends android.support.v4.app.Fragment {
         }
 
     }
+
+
 
 
 }

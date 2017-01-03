@@ -261,9 +261,9 @@ public class PostFragment extends android.support.v4.app.Fragment {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if(task.isSuccessful()){
-                                        newPost.child("likes").push().setValue(user_id);
-                                        newPost.child("dislikes").push().setValue(user_id);
-                                        newPost.child("comments").push().setValue(user_id);
+//                                        newPost.child("likes").push().setValue(user_id);
+//                                        newPost.child("dislikes").push().setValue(user_id);
+//                                        newPost.child("comments").push().setValue(user_id);
 //                                        final DatabaseReference newComment = databaseComments.push();
 //                                        newComment.setValue("testing");
 //                                        newPost.child("comments").setValue(newComment.getKey());

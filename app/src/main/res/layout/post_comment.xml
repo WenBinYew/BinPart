@@ -5,20 +5,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cvComment"
     android:layout_width="match_parent"
-    android:layout_height="90dp"
+    android:layout_height="wrap_content"
     android:layout_gravity="center"
     card_view:cardBackgroundColor="#F5F5F5"
     card_view:cardElevation="15dp">
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             card_view:srcCompat="@drawable/ic_face_black_24dp"
-            android:id="@+id/imgViewFaceComment" />
+            android:id="@+id/imgViewFaceComment"
+            android:layout_marginLeft="2dp"/>
 
         <TextView
             android:text="Name"
@@ -29,22 +30,13 @@
             android:layout_marginTop="5dp"/>
 
         <TextView
-            android:text="Date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/txtViewDateComment"
-            android:layout_toRightOf="@+id/txtViewNameComment"
-            android:layout_marginLeft="150dp"
-            android:layout_marginTop="5dp"/>
-
-        <TextView
             android:text="Comment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/txtViewComment"
             android:layout_below="@+id/txtViewNameComment"
             android:layout_marginTop="5dp"
-            android:layout_marginLeft="5dp"/>
+            android:layout_marginLeft="26dp"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -54,48 +46,81 @@
 
 
             <TextView
-                android:id="@+id/txtViewDislikeCountComment"
+                android:text="Date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_toRightOf="@+id/btnDisikeComment"
-                android:paddingLeft="10dp"
-                android:paddingRight="20dp"
-                android:text="10" />
+                android:id="@+id/txtViewDateComment"
+                android:layout_marginLeft="26dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="29dp" />
 
+            <ImageView
+                android:id="@+id/imageDot"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/txtViewDateComment" />
+            <!--android:src="@drawable/ic_dot"-->
             <TextView
                 android:id="@+id/txtViewLikeCountComment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_toRightOf="@+id/btnLikeComment"
                 android:paddingLeft="10dp"
                 android:paddingRight="20dp"
-                android:text="23" />
 
+                android:text="23"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/btnLikeComment" />
+
+            <TextView
+                android:id="@+id/txtViewDislikeCountComment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="20dp"
+                android:text="10"
+                android:layout_alignBaseline="@+id/btnDisikeComment"
+                android:layout_alignBottom="@+id/btnDisikeComment"
+                android:layout_toEndOf="@+id/btnDisikeComment" />
+
+            <ImageView
+                android:id="@+id/imageDot1"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_alignTop="@+id/imageDot"
+                android:layout_toEndOf="@+id/txtViewLikeCountComment" />
+            <!--android:src="@drawable/ic_dot"-->
             <Button
                 android:id="@+id/btnLikeComment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
                 android:background="@color/white_transparent"
                 android:drawableLeft="@drawable/ic_thumb_up_black_18dp"
                 android:minWidth="0dp"
-                android:paddingLeft="20dp" />
+                android:paddingLeft="20dp"
+                android:paddingRight="10dp"
+                android:layout_alignBaseline="@+id/txtViewLikeCountComment"
+                android:layout_alignBottom="@+id/txtViewLikeCountComment"
+                android:layout_toEndOf="@+id/imageDot" />
 
             <Button
                 android:id="@+id/btnDisikeComment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
+                android:paddingLeft="10dp"
+                android:paddingRight="20dp"
                 android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@id/txtViewLikeCountComment"
                 android:background="@color/white_transparent"
                 android:drawableLeft="@drawable/ic_thumb_down_black_18dp"
-                android:minWidth="0dp" />
-
+                android:minWidth="0dp"
+                android:layout_marginStart="17dp"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/imageDot1" />
 
 
         </RelativeLayout>
