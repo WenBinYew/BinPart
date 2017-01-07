@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cvPost"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginBottom="5dp"
+    card_view:cardBackgroundColor="#F5F5F5"
+    card_view:contentPaddingBottom="0dp"
+    card_view:contentPaddingLeft="15dp"
+    card_view:contentPaddingRight="15dp"
+    card_view:contentPaddingTop="10dp">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true">
+
+
+        <ImageView
+            android:id="@+id/imgViewImage"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            card_view:srcCompat="@color/white_transparent"
+            android:layout_marginTop="20dp"
+            android:padding="2px"
+            android:layout_below="@+id/txtViewPostDate"
+            android:background="#F5F5F5"/>
+
+        <TextView
+            android:id="@+id/txtViewPostName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:text="Name"
+            android:layout_toRightOf="@+id/imgViewFace"
+            android:paddingLeft="25dp"
+            android:layout_marginTop="3dp" />
+
+        <View
+            android:id="@+id/horizontalLine"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_below="@+id/txtViewContent"
+            android:background="@android:color/darker_gray"/>
+
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_below="@+id/horizontalLine"
+            android:id="@+id/relativeLayout">
+
+            <TextView
+                android:id="@+id/txtViewSeperator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/btntoClickComment"
+                android:text="|"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/txtViewSeperator2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/btntoClickDislike"
+                android:text="|"
+                android:textSize="20sp" />
+            <RelativeLayout
+                android:id="@+id/btntoClickComment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/btnComment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:background="@color/white_transparent"
+                    android:drawableLeft="@drawable/ic_comment_black_18px"
+                    android:minWidth="0dp"
+                    android:paddingLeft="15dp"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    />
+
+                <TextView
+                    android:id="@+id/txtViewCommentCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_toRightOf="@+id/btnComment"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="20dp"
+                    android:text="103" />
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/btntoClickLike"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/txtViewSeperator">
+                <TextView
+                    android:id="@+id/txtViewLikeCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_toRightOf="@+id/btnLike"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="20dp"
+                    android:text="23" />
+
+                <Button
+                    android:id="@+id/btnLike"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:background="@color/white_transparent"
+                    android:drawableLeft="@drawable/ic_thumb_up_black_18dp"
+                    android:minWidth="0dp"
+                    android:paddingLeft="20dp" />
+            </RelativeLayout>
+            <!--android:layout_toRightOf="@+id/txtViewSeperator"-->
+
+
+            <RelativeLayout
+                android:id="@+id/btntoClickDislike"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/btntoClickLike">
+                <Button
+                    android:id="@+id/btnDisike"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:background="@color/white_transparent"
+                    android:drawableLeft="@drawable/ic_thumb_down_black_18dp"
+                    android:minWidth="0dp" />
+                <TextView
+                    android:id="@+id/txtViewDislikeCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_toRightOf="@+id/btnDisike"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="20dp"
+                    android:text="10" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/btntoClickFavourite"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/txtViewSeperator2">
+                <Button
+                    android:id="@+id/btnFavourite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginLeft="30dp"
+                    android:background="@color/white_transparent"
+                    android:drawableLeft="@drawable/ic_favorite_black_18dp"
+                    />
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/txtViewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Title"
+            android:textSize="18sp"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/imgViewFace"
+            android:textColor="@android:color/background_dark"
+            />
+
+        <TextView
+            android:id="@+id/txtViewPostDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date"
+            android:layout_toRightOf="@+id/txtViewPostName"
+            android:layout_marginLeft="125dp"
+            />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            card_view:srcCompat="@drawable/ic_face_black_24dp"
+            android:id="@+id/imgViewFace" />
+
+        <TextView
+            android:id="@+id/txtViewContent"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:text="Content"
+            android:minLines="2"
+            android:layout_marginBottom="10dp"
+            android:layout_below="@+id/txtViewTitle"
+            android:layout_alignParentStart="true" />
+
+    </RelativeLayout>
+
+
+</android.support.v7.widget.CardView>
+
