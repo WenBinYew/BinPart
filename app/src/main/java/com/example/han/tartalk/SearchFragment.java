@@ -5,10 +5,13 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 import android.app.SearchManager;
 import android.widget.SearchView;
@@ -28,13 +31,13 @@ import java.util.ArrayList;
 public class SearchFragment extends android.support.v4.app.Fragment {
 
     private RecyclerView searchPost;
-    private CardView cvPost;
-    private SearchView searchView;
-    private ArrayList<Post> postList = new ArrayList<Post>();
+    private ArrayList<Post> postList = HomeFragment.postList;
     private ArrayList<Post> postListSearch = new ArrayList<Post>();
     private DatabaseReference database;
+    private EditText editTxtSearch;
     //private DatabaseReference databaseComments;
-    private static final String TAG = "HomeFragment";
+    private static final String TAG = "Search Fragment";
+    private PostAdapter adapter;
 
     public SearchFragment() {
 
@@ -47,43 +50,30 @@ public class SearchFragment extends android.support.v4.app.Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.search_fragment, container, false);
 
-
-        searchView = (SearchView) v.findViewById(R.id.searchView);
-
+        editTxtSearch =  (EditText) v.findViewById(R.id.editTxtSearch);
         searchPost = (RecyclerView) v.findViewById(R.id.searchPost);
-        cvPost = (CardView) v.findViewById(R.id.cvPost);
         database = FirebaseDatabase.getInstance().getReference().child("Posts");
         //databaseComments = FirebaseDatabase.getInstance().getReference().child("Comments");
+        adapter = new PostAdapter(getContext());
+        //retrieve();
 
-        retrieve();
+        searchPost.setAdapter(adapter);
+        adapter.setData(postList);
+
         searchPost.setHasFixedSize(true);
-        searchPost.setLayoutManager(new LinearLayoutManager(getContext()));
+        searchPost.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        editTxtSearch.addTextChangedListener(new TextWatcher() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                postListSearch.clear();
-                String userQuery = query.toString().toLowerCase();
-                for(Post postArr : postList){
-                    final String text = postArr.content.toString().toLowerCase();
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                    if(text.contains(userQuery)){
-
-                        postListSearch.add(postArr);
-                    }
-                }
-
-                final PostAdapter adapter = new PostAdapter(getContext());
-                searchPost.setAdapter(adapter);
-                adapter.setData(postListSearch);
-                return true;
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 postListSearch.clear();
-                String query = newText.toString().toLowerCase();
-               // String query = searchView.getQuery().toString().toLowerCase();
+                String query = charSequence.toString().toLowerCase();
+                // String query = searchView.getQuery().toString().toLowerCase();
                 for(Post postArr : postList){
                     final String text = postArr.content.toString().toLowerCase();
 
@@ -93,10 +83,28 @@ public class SearchFragment extends android.support.v4.app.Fragment {
                     }
                 }
 
-                final PostAdapter adapter = new PostAdapter(getContext());
+                adapter = new PostAdapter(getContext());
                 searchPost.setAdapter(adapter);
                 adapter.setData(postListSearch);
-                return true;
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                postListSearch.clear();
+                String userQuery = editable.toString().toLowerCase();
+                for(Post postArr : postList){
+                    final String text = postArr.content.toString().toLowerCase();
+
+                    if(text.contains(userQuery)){
+
+                        postListSearch.add(postArr);
+                    }
+                }
+
+                adapter = new PostAdapter(getContext());
+                searchPost.setAdapter(adapter);
+                adapter.setData(postListSearch);
+
             }
         });
 
@@ -112,15 +120,7 @@ public class SearchFragment extends android.support.v4.app.Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 fetchData(dataSnapshot);
                 final PostAdapter adapter = new PostAdapter(getContext());
-                //adapter.setData(postList);
-                //adapter.setDataForArray(postList);
-
                 searchPost.setAdapter(adapter);
-
-//                if (getActivity() != null) {
-//                    View headerView = LayoutInflater.from(getActivity()).inflate(R.layout.testing, rvPost, false);
-//                    adapter.setHeaderView(headerView);
-//                }
                 adapter.setData(postList);
 
             }
@@ -142,27 +142,11 @@ public class SearchFragment extends android.support.v4.app.Fragment {
 
 
             final Post post = ds.getValue(Post.class);
-//            Query myComments = databaseComments.orderByChild(post.comments);
-//            myComments.addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    post.commentsCount = (int) dataSnapshot.getChildrenCount();
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
-            //post.likes = (int) ds.child("likes").getChildrenCount();
-            //ds.child("likes").getChildren();
+
             postList.add(post);
 
         }
 
     }
-
-
-
 
 }

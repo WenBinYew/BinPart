@@ -45,7 +45,8 @@
         android:layout_below="@+id/titleField"
         android:layout_centerHorizontal="true"
         android:padding="15dp"
-        android:hint="Post Description" />
+        android:hint="Post Description"
+        android:imeOptions="actionSend"/>
 
     <Button
         android:text="Post"

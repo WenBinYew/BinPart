@@ -13,7 +13,8 @@ public class User implements Serializable {
 
     public String Image;
     public String Name;
-    public Map<String, Object> postID;
+    public Map<String, Object> favourite = null;
+    public Map<String, Object> postID = null;
 
 
     public User(){}

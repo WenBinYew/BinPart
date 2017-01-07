@@ -8,11 +8,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -55,6 +60,7 @@ public class PostFragment extends android.support.v4.app.Fragment {
     private DatabaseReference databaseImages;
     private FirebaseAuth auth;
     private FirebaseUser user;
+    private DatabaseReference userPost;
     private DatabaseReference users;
     private Post post;
     private DatabaseReference databaseComments;
@@ -72,7 +78,8 @@ public class PostFragment extends android.support.v4.app.Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
 
-        final View v = inflater.inflate(R.layout.post_fragment,container,false);
+        final View v = inflater.inflate(R.layout.post_fragment, container, false);
+
         progressDialog = new ProgressDialog(getActivity());
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
@@ -80,56 +87,55 @@ public class PostFragment extends android.support.v4.app.Fragment {
 //        authListener = new FirebaseAuth.AuthStateListener() {
 //            @Override
 //            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (auth.getCurrentUser() == null) {
-                    LayoutInflater li = LayoutInflater.from(getActivity());
-                    View promptsView = li.inflate(R.layout.activity_login, null);
-                    editTextEmail = (EditText)promptsView.findViewById(R.id.editTextEmail);
-                    editTextPassword = (EditText)promptsView.findViewById(R.id.editTextPassword);
-                    textViewRegister = (TextView)promptsView.findViewById(R.id.textViewRegister);
-                    textViewForgetPassword = (TextView)promptsView.findViewById(R.id.textViewForgetPassword);
-                    buttonSignIn = (Button)promptsView.findViewById(R.id.buttonSignIn);
-                    buttonCancel = (Button)promptsView.findViewById(R.id.buttonCancel);
+        if (auth.getCurrentUser() == null) {
+            LayoutInflater li = LayoutInflater.from(getActivity());
+            View promptsView = li.inflate(R.layout.activity_login, null);
+            editTextEmail = (EditText) promptsView.findViewById(R.id.editTextEmail);
+            editTextPassword = (EditText) promptsView.findViewById(R.id.editTextPassword);
+            textViewRegister = (TextView) promptsView.findViewById(R.id.textViewRegister);
+            textViewForgetPassword = (TextView) promptsView.findViewById(R.id.textViewForgetPassword);
+            buttonSignIn = (Button) promptsView.findViewById(R.id.buttonSignIn);
+            buttonCancel = (Button) promptsView.findViewById(R.id.buttonCancel);
 
-                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-                    alertDialog = alertDialogBuilder.create();
-
-
-                    alertDialogBuilder.setCancelable(false);
-                    alertDialog.setCancelable(false);
-                    textViewRegister.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            startActivity(new Intent(getActivity(),SignUpActivity.class));
-                        }
-                    });
-                    textViewForgetPassword.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            startActivity(new Intent(getActivity(),ResetPasswordActivity.class));
-                        }
-                    });
-                    buttonSignIn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-
-                            chkLogin();
+            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+            alertDialog = alertDialogBuilder.create();
 
 
-                        }
-                    });
-                    buttonCancel.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
+            alertDialogBuilder.setCancelable(false);
+            alertDialog.setCancelable(false);
+            textViewRegister.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startActivity(new Intent(getActivity(), SignUpActivity.class));
+                }
+            });
+            textViewForgetPassword.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startActivity(new Intent(getActivity(), ResetPasswordActivity.class));
+                }
+            });
+            buttonSignIn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-                            alertDialog.dismiss();
-                            HomeFragment fragment = new HomeFragment();
-                            getFragmentManager().beginTransaction().replace(R.id.main_container,new HomeFragment()).commit();
+                    chkLogin();
 
-                        }
-                    });
-                    alertDialog.setView(promptsView);
-                    alertDialog.show();
 
+                }
+            });
+            buttonCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    alertDialog.dismiss();
+                    HomeFragment fragment = new HomeFragment();
+                    getFragmentManager().beginTransaction().replace(R.id.main_container, new HomeFragment()).commit();
+
+                }
+            });
+            alertDialog.setView(promptsView);
+            alertDialog.show();
 
 
 //                    alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -143,72 +149,96 @@ public class PostFragment extends android.support.v4.app.Fragment {
 //                    });
 //                    AlertDialog alertDialog = alertDialogBuilder.create();
 //                    alertDialog.show();
-                }else{
-                    selectImage = (ImageButton) v.findViewById(R.id.imageButton);
-                    titleField = (EditText) v.findViewById(R.id.titleField);
-                    descField = (EditText) v.findViewById(R.id.descField);
-                    postBtn = (Button) v.findViewById(R.id.btnPost);
-                    storage = FirebaseStorage.getInstance().getReference();
-                    database = FirebaseDatabase.getInstance().getReference().child("Posts");
-                    databaseComments = FirebaseDatabase.getInstance().getReference().child("Comments");
-                    databaseImages = FirebaseDatabase.getInstance().getReference().child("Images");
-                    progress = new ProgressDialog(getActivity());
-                    users = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
+        } else {
+            selectImage = (ImageButton) v.findViewById(R.id.imageButton);
+            titleField = (EditText) v.findViewById(R.id.titleField);
+            descField = (EditText) v.findViewById(R.id.descField);
+            descField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                    boolean handled = false;
+                    if (i == EditorInfo.IME_ACTION_SEND) {
+                        postBtn.performClick();
+                        handled = true;
+                    }
+                    return handled;
+                }
+            });
+            postBtn = (Button) v.findViewById(R.id.btnPost);
+            storage = FirebaseStorage.getInstance().getReference();
+            database = FirebaseDatabase.getInstance().getReference().child("Posts");
+            databaseComments = FirebaseDatabase.getInstance().getReference().child("Comments");
+            databaseImages = FirebaseDatabase.getInstance().getReference().child("Images");
+            progress = new ProgressDialog(getActivity());
+            users = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
+            //userPost = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("postID");
+            selectImage.setOnClickListener(new View.OnClickListener() {
 
-                    selectImage.setOnClickListener(new View.OnClickListener(){
-
-                        @Override
-                        public void onClick(View view) {
-                            Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                            galleryIntent.setType("image/*");
-                            startActivityForResult(galleryIntent,GALLERY_REQUEST);
-
-                        }
-                    });
-
-                    postBtn.setOnClickListener(new View.OnClickListener(){
-                        @Override
-                        public void onClick(View view) {
-                            startPosting();
-                        }
-                    });
-
+                @Override
+                public void onClick(View view) {
+                    Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                    galleryIntent.setType("image/*");
+                    startActivityForResult(galleryIntent, GALLERY_REQUEST);
 
                 }
-//            }
-//        };
+            });
+
+            postBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startPosting();
+                }
+            });
+
+
+        }
 
 
         return v;
 
     }
-    private void chkLogin(){
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.post, menu);
+
+    }
+
+    private void chkLogin() {
         final String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
 
-        if(TextUtils.isEmpty(email)){
+        if (TextUtils.isEmpty(email)) {
             //email is empty
             Toast.makeText(getActivity(), "Please enter email", Toast.LENGTH_SHORT).show();
-            return ;
+            return;
         }
-        if(TextUtils.isEmpty(password)){
+        if (TextUtils.isEmpty(password)) {
             //password is empty
             Toast.makeText(getActivity(), "Please enter password", Toast.LENGTH_SHORT).show();
-            return ;
+            return;
         }
         progressDialog.setMessage("Loading...");
         progressDialog.show();
 
-        auth.signInWithEmailAndPassword(email,password).addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()) {
+                if (task.isSuccessful()) {
                     progressDialog.setMessage("Login to TarTalk.");
                     progressDialog.show();
                     progressDialog.dismiss();
                     alertDialog.dismiss();
 
-                }else{
+                } else {
                     Toast.makeText(getActivity(), "Fail to Login. please try again. ", Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
                 }
@@ -216,29 +246,6 @@ public class PostFragment extends android.support.v4.app.Fragment {
         });
     }
 
-//    private void checkUserExist() {
-//        final String user_id = auth.getCurrentUser().getUid();
-//
-//        database.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.hasChild(user_id)) {
-//                    Intent mainIntent = new Intent(getActivity(), MainActivity.class);
-//                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                    startActivity(mainIntent);
-//                } else {
-//                    Toast.makeText(getActivity(), "Error login", Toast.LENGTH_LONG).show();
-//
-//                }
-//            }
-//
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-//    }
 
     private void startPosting() {
 
@@ -248,9 +255,9 @@ public class PostFragment extends android.support.v4.app.Fragment {
         final String title_val = titleField.getText().toString().trim();
         final String desc_val = descField.getText().toString().trim();
 
-        if(!TextUtils.isEmpty(title_val) && !TextUtils.isEmpty(desc_val) && imageUri !=null){
+        if (!TextUtils.isEmpty(title_val) && !TextUtils.isEmpty(desc_val) && imageUri != null) {
             DatabaseReference newImageKey = databaseImages.push();
-            StorageReference filepath = storage.child("Images").child(newImageKey.getKey().toString());
+            StorageReference filepath = storage.child("Images").child(newImageKey.getKey());
 
             filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -264,58 +271,23 @@ public class PostFragment extends android.support.v4.app.Fragment {
                     final String user_id = auth.getCurrentUser().getUid();
 
 
-
                     final DatabaseReference newPost = database.push();
 
-                    users.addValueEventListener(new ValueEventListener() {
+                    users.child("Name").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            post = new Post(desc_val,strDate,downloadUrl.toString(),newPost.getKey(),dataSnapshot.child("Name").getValue().toString()
-                                    ,title_val,user_id);
-//                            post.setId(newPost.getKey());
-//                            post.setContent(desc_val);
-//                            post.setTitle(title_val);
-//                            post.setUid(user_id);
-//                            post.setDate(strDate);
-//                            post.setImage(downloadUrl.toString());
-//                            post.setName(dataSnapshot.child("Name").getValue().toString());
-
+                            String name = dataSnapshot.getValue().toString();
+                            post = new Post(desc_val, strDate, downloadUrl.toString(), newPost.getKey(), name, title_val, user_id);
                             newPost.setValue(post).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    if(task.isSuccessful()){
-//                                        newPost.child("likes").push().setValue(user_id);
-//                                        newPost.child("dislikes").push().setValue(user_id);
-//                                        newPost.child("comments").push().setValue(user_id);
-//                                        final DatabaseReference newComment = databaseComments.push();
-//                                        newComment.setValue("testing");
-//                                        newPost.child("comments").setValue(newComment.getKey());
+                                    if (task.isSuccessful()) {
                                         progress.dismiss();
-                                        HomeFragment fragment = new HomeFragment();
-                                        getFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
-
+                                        //userPost.push().setValue(newPost.getKey());
+                                        users.child("postID").push().setValue(newPost.getKey());
                                     }
                                 }
                             });
-
-
-//                            newPost.child("Id").setValue(newPost.getKey());
-//                            newPost.child("Uid").setValue(user_id);
-//                            newPost.child("Title").setValue(title_val);
-//                            newPost.child("Content").setValue(desc_val);
-//                            newPost.child("Image").setValue(downloadUrl.toString());
-//                            newPost.child("Date").setValue(strDate);
-//                            newPost.child("Name").setValue(dataSnapshot.child("Name").getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                @Override
-//                                public void onComplete(@NonNull Task<Void> task) {
-//                                    if(task.isSuccessful()){
-//                                        progress.dismiss();
-//                                        HomeFragment fragment = new HomeFragment();
-//                                        getFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
-//
-//                                    }
-//                                }
-//                            });
                         }
 
                         @Override
@@ -324,20 +296,56 @@ public class PostFragment extends android.support.v4.app.Fragment {
                         }
                     });
 
-                    //newPost.child("Date").push().setValue("hihih");
                 }
             });
         }
-
+//        } else if (!TextUtils.isEmpty(title_val) && !TextUtils.isEmpty(desc_val)) {
+//
+//            Calendar c = Calendar.getInstance();
+//            SimpleDateFormat sdf = new SimpleDateFormat("dd:MMMM:yyyy HH:mm:ss a");
+//            final String strDate = sdf.format(c.getTime());
+//            final String user_id = auth.getCurrentUser().getUid();
+//            final DatabaseReference newPost = database.push();
+//
+//            users.addValueEventListener(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot dataSnapshot) {
+//                    post = new Post(desc_val, strDate,"null", newPost.getKey(), dataSnapshot.child("Name").getValue().toString()
+//                            , title_val, user_id);
+//
+//                    newPost.setValue(post).addOnCompleteListener(new OnCompleteListener<Void>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<Void> task) {
+//                            if (task.isSuccessful()) {
+//                                userPost.push().setValue(newPost.getKey());
+//                                progress.dismiss();
+//                                HomeFragment fragment = new HomeFragment();
+//                                getFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
+//                                MainActivity.bottomBar.setDefaultTabPosition(0);
+//
+//                            }
+//                        }
+//                    });
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError databaseError) {
+//
+//                }
+//            });
+//
+//        }
+        HomeFragment fragment = new HomeFragment();
+        getFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
+        MainActivity.bottomBar.selectTabAtPosition(0, true);
     }
-
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK){
+        if (requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK) {
 
             imageUri = data.getData();
             Picasso.with(getContext())

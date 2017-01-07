@@ -31,6 +31,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
+import static android.R.attr.data;
 import static android.R.attr.name;
 
 
@@ -51,6 +54,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
     private ProgressDialog progressDialog;
     private AlertDialog alertDialog;
     private DatabaseReference database;
+    private ArrayList<String> postIDList;
 
     @Nullable
     @Override
@@ -60,15 +64,15 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
 
         String[] profile;
         View view = inflater.inflate(R.layout.profile_fragment, container, false);
-        listViewProfile = (ListView)view.findViewById(R.id.listViewProfile);
+        listViewProfile = (ListView) view.findViewById(R.id.listViewProfile);
         profile = getResources().getStringArray(R.array.Profile);
         Integer[] icon = {
                 R.drawable.ic_action_chgpassword,
                 R.drawable.ic_action_post,
 
         };
-        btnLogout = (Button)view.findViewById(R.id.btnLogout);
-        textViewNickname = (TextView)view.findViewById(R.id.textViewNickname);
+        btnLogout = (Button) view.findViewById(R.id.btnLogout);
+        textViewNickname = (TextView) view.findViewById(R.id.textViewNickname);
 
         mAuth = FirebaseAuth.getInstance();
         btnLogout.setOnClickListener(this);
@@ -81,16 +85,16 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
 //        authListener = new FirebaseAuth.AuthStateListener() {
 //            @Override
 //            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                //Toast.makeText(getActivity(),"user Email 2: " + mAuth.hrentUser().getEmail(),Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(),"user Email 2: " + mAuth.hrentUser().getEmail(),Toast.LENGTH_SHORT).show();
         if (mAuth.getCurrentUser() == null) {
             LayoutInflater li = LayoutInflater.from(getActivity());
             View promptsView = li.inflate(R.layout.activity_login, null);
-            editTextEmail = (EditText)promptsView.findViewById(R.id.editTextEmail);
-            editTextPassword = (EditText)promptsView.findViewById(R.id.editTextPassword);
-            textViewRegister = (TextView)promptsView.findViewById(R.id.textViewRegister);
-            textViewForgetPassword = (TextView)promptsView.findViewById(R.id.textViewForgetPassword);
-            buttonSignIn = (Button)promptsView.findViewById(R.id.buttonSignIn);
-            buttonCancel = (Button)promptsView.findViewById(R.id.buttonCancel);
+            editTextEmail = (EditText) promptsView.findViewById(R.id.editTextEmail);
+            editTextPassword = (EditText) promptsView.findViewById(R.id.editTextPassword);
+            textViewRegister = (TextView) promptsView.findViewById(R.id.textViewRegister);
+            textViewForgetPassword = (TextView) promptsView.findViewById(R.id.textViewForgetPassword);
+            buttonSignIn = (Button) promptsView.findViewById(R.id.buttonSignIn);
+            buttonCancel = (Button) promptsView.findViewById(R.id.buttonCancel);
 
             final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
             alertDialog = alertDialogBuilder.create();
@@ -101,13 +105,13 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
             textViewRegister.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    startActivity(new Intent(getActivity(),SignUpActivity.class));
+                    startActivity(new Intent(getActivity(), SignUpActivity.class));
                 }
             });
             textViewForgetPassword.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    startActivity(new Intent(getActivity(),ResetPasswordActivity.class));
+                    startActivity(new Intent(getActivity(), ResetPasswordActivity.class));
                 }
             });
             buttonSignIn.setOnClickListener(new View.OnClickListener() {
@@ -125,44 +129,73 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
 
                     alertDialog.dismiss();
                     HomeFragment fragment = new HomeFragment();
-                    getFragmentManager().beginTransaction().replace(R.id.main_container,new HomeFragment()).commit();
+                    getFragmentManager().beginTransaction().replace(R.id.main_container, new HomeFragment()).commit();
 
                 }
             });
             alertDialog.setView(promptsView);
             alertDialog.show();
-                }
-        if(mAuth.getCurrentUser()!=null){
-        database = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+        }
+        if (mAuth.getCurrentUser() != null) {
 
+
+            database = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+            postIDList = new ArrayList<>();
             database.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                   String name= dataSnapshot.child("Name").getValue().toString();
-                    textViewNickname.setText(name);
+                    final User post = dataSnapshot.getValue(User.class);
+//                    textViewNickname.setText(post.Name);
+
+//                    for (Object value : post.postID.values()) {
+//                        postIDList.add(value.toString());
+//                    }
+
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
 
                 }
+
+
             });
+
+//            database.addValueEventListener(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot dataSnapshot) {
+//                   String name= dataSnapshot.child("Name").getValue().toString();
+//                    textViewNickname.setText(name);
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError databaseError) {
+//
+//                }
+//            });
+
+            TextView textViewPost = (TextView) view.findViewById(R.id.textViewPost);
+            if (postIDList.size() > 0) {
+                textViewPost.setText(postIDList.size());
+            } else {
+                textViewPost.setText("" + 0);
+            }
 
         }
 
-                //Toast.makeText(getActivity(),"user Email 3: " + mAuth.getCurrentUser().getEmail(),Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(),"user Email 3: " + mAuth.getCurrentUser().getEmail(),Toast.LENGTH_SHORT).show();
 //            }
 //        };
 
 
-        CustomListAdapter adapter = new CustomListAdapter(getActivity(),profile, icon);
+        CustomListAdapter adapter = new CustomListAdapter(getActivity(), profile, icon);
         listViewProfile.setAdapter(adapter);
         listViewProfile.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //Toast.makeText(getActivity().getApplicationContext(),"Position get " + position, Toast.LENGTH_SHORT).show();
 
-                switch(position){
+                switch (position) {
                     case 0:
                         startActivity(new Intent(getActivity(), ChangePasswordActivity.class));
                         break;
@@ -170,22 +203,24 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
                         startActivity(new Intent(getActivity(), MyHistoryActivity.class));
                         break;
                 }
-            };
+            }
+
+            ;
         });
         setHasOptionsMenu(true);
         return view;
     }
 
-    private void chkLogin(){
+    private void chkLogin() {
         final String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
 
-        if(TextUtils.isEmpty(email)){
+        if (TextUtils.isEmpty(email)) {
             //email is empty
             Toast.makeText(getActivity(), "Please enter email", Toast.LENGTH_SHORT).show();
             return;
         }
-        if(TextUtils.isEmpty(password)){
+        if (TextUtils.isEmpty(password)) {
             //password is empty
             Toast.makeText(getActivity(), "Please enter password", Toast.LENGTH_SHORT).show();
             return;
@@ -193,14 +228,14 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         progressDialog.setMessage("Loading...");
         progressDialog.show();
 
-        mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()) {
+                if (task.isSuccessful()) {
                     progressDialog.dismiss();
                     alertDialog.dismiss();
 
-                }else{
+                } else {
                     Toast.makeText(getActivity(), "Fail to Login. please try again. ", Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
                 }
@@ -210,10 +245,10 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
 
     @Override
     public void onClick(View view) {
-        if(view == btnLogout){
-            from =true;
+        if (view == btnLogout) {
+            from = true;
             mAuth.signOut();
-            getFragmentManager().beginTransaction().replace(R.id.main_container,fragment).commit();
+            getFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
         }
 
     }

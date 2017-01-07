@@ -13,6 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.vision.text.Text;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
@@ -33,9 +35,16 @@ class CommentAdapter extends HFRecyclerViewAdapter<Comment, CommentAdapter.Comme
     // private DatabaseReference databaseComments;
     //public String postID;
 
+    private FirebaseAuth auth;
+    private FirebaseUser user;
+
     public CommentAdapter(Context context) {
 
         super(context);
+
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
+
         //DatabaseReference databaseComments = FirebaseDatabase.getInstance().getReference().child("Post");
         //DatabaseReference databasePost = FirebaseDatabase.getInstance().getReference().child("Post");
         //databaseComments = FirebaseDatabase.getInstance().getReference().child("Posts").child(postID).child("comments");
@@ -115,117 +124,76 @@ class CommentAdapter extends HFRecyclerViewAdapter<Comment, CommentAdapter.Comme
             @Override
             public void onClick(View view) {
 
-                ArrayList<String> check = new ArrayList<String>();
-                if (getData().get(position).likes != null) {
-                    for (Object value : getData().get(position).likes.values()) {
-                        check.add(value.toString());
-                    }
-
-                    for (int i = 0; i < check.size(); i++) {
-                        if (check.get(i).toString().equals(getData().get(position).uid)) {
-                            Toast.makeText(mContext, "Already liked this comment", Toast.LENGTH_SHORT).show();
-                        } else {
-                            int x = getData().get(position).likes.size();
-                            holder.txtViewLikeCountComment.setText("" + (x + 1));
-
-                            PostDetail.databaseComments.child(getData().get(position).id).child("likes").push().setValue(getData().get(position).uid);
+                if (auth.getCurrentUser() != null) {
+                    ArrayList<String> check = new ArrayList<String>();
+                    if (getData().get(position).likes != null) {
+                        for (Object value : getData().get(position).likes.values()) {
+                            check.add(value.toString());
                         }
+                        Boolean done = false;
+                        for (int i = 0; i < check.size(); i++) {
+                            if (check.get(i).toString().equals(getData().get(position).uid)) {
+                                Toast.makeText(mContext, "Already liked this comment", Toast.LENGTH_SHORT).show();
+                                done = true;
+                            }
+                        }
+                        if (done = false) {
+//                            int x = getData().get(position).likes.size();
+//                            holder.txtViewLikeCountComment.setText("" + (x + 1));
+                            PostDetail.databaseComments.child(getData().get(position).id).child("likes").push().setValue(user.getUid());
+                            PostDetail.rvComment.smoothScrollToPosition(position);
+
+                        }
+
+                    } else {
+
+                        //holder.txtViewLikeCountComment.setText("1");
+                        PostDetail.databaseComments.child(getData().get(position).id).child("likes").push().setValue(user.getUid());
+                        PostDetail.rvComment.smoothScrollToPosition(position);
                     }
                 } else {
-
-                    holder.txtViewLikeCountComment.setText("1");
-                    PostDetail.databaseComments.child(getData().get(position).id).child("likes").push().setValue(getData().get(position).uid);
+                    Toast.makeText(mContext, "Please login to like comment", Toast.LENGTH_SHORT).show();
                 }
             }
 
         });
 
+        holder.btnDisikeComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
-//            if(isHeader(position)) {
-//                holder.txtViewTitle.setText(getData().get(position).title);
-//                holder.txtViewContent.setText(getData().get(position).content);
-//            }
-//        holder.txtViewTitle.setText(getData().get(position).title);
-//        holder.txtViewContent.setText(getData().get(position).content);
-//
-//
-//        holder.txtViewPostName.setText(getData().get(position).name);
-//        Picasso.with(mContext)
-//                .load(getData().get(position).image)
-//                .resize(150, 150)
-//                .centerCrop()
-//                .into(holder.imgViewImage);
-//
-//        Calendar c = Calendar.getInstance();
-//        SimpleDateFormat sdf = new SimpleDateFormat("dd:MMMM:yyyy HH:mm:ss a");
-//        final String strDate = sdf.format(c.getTime());
-//        Date d1 = null;
-//        Date d2 = null;
-//        try {
-//            d1 = sdf.parse(getData().get(position).date);
-//            d2 = sdf.parse(strDate);
-//
-//            Calendar cal1 = Calendar.getInstance();
-//            cal1.setTime(d1);
-//            Calendar cal2 = Calendar.getInstance();
-//            cal2.setTime(d2);
-//
-//            Long result = daysBetween(cal1.getTime(), cal2.getTime());
-//            if(result == 0){
-//                holder.txtViewDate.setText(""+ "Today");
-//            }else if(result == 1) {
-//                holder.txtViewDate.setText(result.toString() + " day ago");
-//            }else{
-//                holder.txtViewDate.setText(result.toString() + " days ago");
-//            }
-//
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//
-//        if(getData().get(position).likes != null){
-//            holder.txtViewLikeCount.setText(""+getData().get(position).likes.size());
-//        }else{
-//            holder.txtViewLikeCount.setText(""+ 0);
-//        }
-//
-//        if(getData().get(position).dislikes != null){
-//            holder.txtViewDislikeCount.setText(""+getData().get(position).dislikes.size());
-//        }else{
-//            holder.txtViewDislikeCount.setText(""+ 0);
-//        }
-//
-//        if(getData().get(position).comments != null){
-//            holder.txtViewCommentCount.setText(""+getData().get(position).comments.size());
-//        }else{
-//            holder.txtViewCommentCount.setText(""+ 0);
-//        }
+                if (auth.getCurrentUser() != null) {
+                    ArrayList<String> check = new ArrayList<String>();
+                    if (getData().get(position).dislikes != null) {
+                        for (Object value : getData().get(position).dislikes.values()) {
+                            check.add(value.toString());
+                        }
+                        Boolean done = false;
+                        for (int i = 0; i < check.size(); i++) {
+                            if (check.get(i).toString().equals(getData().get(position).uid)) {
+                                Toast.makeText(mContext, "Already disliked this comment", Toast.LENGTH_SHORT).show();
+                                done = true;
+                            }
+                        }
 
+                        if (done = false) {
+//                            int x = getData().get(position).dislikes.size();
+//                            holder.txtViewDislikeCountComment.setText("" + (x + 1));
+                            PostDetail.databaseComments.child(getData().get(position).id).child("dislikes").push().setValue(user.getUid());
+                            PostDetail.rvComment.smoothScrollToPosition(position);
+                        }
+                    } else {
 
-//        holder.cvPost.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent postDetails = new Intent(view.getContext(), PostDetail.class);
-//                mContext.startActivity(postDetails);
-//
-//            }
-//        });
-//
-//        holder.btnComment.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent postDetails = new Intent(view.getContext(), PostDetail.class);
-//                mContext.startActivity(postDetails);
-//            }
-//        });
-//
-//        holder.txtViewCommentCount.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent postDetails = new Intent(view.getContext(), PostDetail.class);
-//                mContext.startActivity(postDetails);
-//            }
-//        });
+//                        holder.txtViewDislikeCountComment.setText("1");
+                        PostDetail.databaseComments.child(getData().get(position).id).child("dislikes").push().setValue(user.getUid());
+                        PostDetail.rvComment.smoothScrollToPosition(position);
+                    }
+                } else {
+                    Toast.makeText(mContext, "Please login to dislike comment", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        });
 
 
     }
@@ -233,22 +201,6 @@ class CommentAdapter extends HFRecyclerViewAdapter<Comment, CommentAdapter.Comme
     //View Holder class
     public static class CommentViewHolder extends RecyclerView.ViewHolder {
 
-//        public CardView cvPost;
-//        public RecyclerView rvPost;
-//        public TextView txtViewID;
-//        //public TextView txtViewContent;
-//        public TextView txtViewDate;
-//        public TextView txtViewPostName;
-//        public TextView txtViewTitle;
-//        public TextView txtViewCommentCount;
-//        public TextView txtViewLikeCount;
-//        public TextView txtViewDislikeCount;
-//        public ImageView imgViewImage;
-//
-//        public Button btnComment;
-//        public Button btnLike;
-//        public Button btnDislike;
-//        public Button btnFavourite;
 
         public TextView txtViewNameComment;
         public TextView txtViewComment;
@@ -261,22 +213,6 @@ class CommentAdapter extends HFRecyclerViewAdapter<Comment, CommentAdapter.Comme
 
         public CommentViewHolder(View itemView) {
             super(itemView);
-//            cvPost = (CardView) itemView.findViewById(R.id.cvPost);
-//            rvPost = (RecyclerView) itemView.findViewById(R.id.rvPost);
-//            //txtViewContent = (TextView) itemView.findViewById(R.id.txtViewContent);
-//            txtViewID = (TextView) itemView.findViewById(R.id.txtViewPostID);
-//            txtViewDate = (TextView) itemView.findViewById(R.id.txtViewPostDate);
-//            txtViewPostName = (TextView) itemView.findViewById(R.id.txtViewPostName);
-//            txtViewTitle = (TextView) itemView.findViewById(R.id.txtViewTitle);
-//            txtViewCommentCount = (TextView) itemView.findViewById(R.id.txtViewCommentCount);
-//            txtViewLikeCount = (TextView) itemView.findViewById(R.id.txtViewLikeCount);
-//            txtViewDislikeCount = (TextView) itemView.findViewById(R.id.txtViewDislikeCount);
-//            imgViewImage = (ImageView) itemView.findViewById(R.id.imgViewImage);
-//            btnComment = (Button) itemView.findViewById(R.id.btnComment);
-//            btnLike = (Button) itemView.findViewById(R.id.btnLike);
-//            btnDislike = (Button) itemView.findViewById(R.id.btnDisike);
-//            btnFavourite = (Button) itemView.findViewById(R.id.btnFavourite);
-
 
             txtViewNameComment = (TextView) itemView.findViewById(R.id.txtViewNameComment);
             txtViewComment = (TextView) itemView.findViewById(R.id.txtViewComment);

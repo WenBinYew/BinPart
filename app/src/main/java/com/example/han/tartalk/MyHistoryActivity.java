@@ -13,7 +13,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.fitness.data.Value;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,10 +30,14 @@ public class MyHistoryActivity extends AppCompatActivity {
 
     private RecyclerView rvPost;
     private CardView cvPost;
-    private DatabaseReference mDatabase,pDatabase;
-    private ArrayList<Post> postList = new ArrayList<Post>();;
+    private DatabaseReference mDatabase;
+    private DatabaseReference pDatabase;
+    private ArrayList<Post> postList = new ArrayList<Post>();
+    private ArrayList<Post> postListFinal = new ArrayList<Post>();
+    ;
     private ArrayList<String> postIDList;
     private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
 
 
     @Override
@@ -40,35 +46,79 @@ public class MyHistoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my_history);
 
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+        mUser = mAuth.getCurrentUser();
+        mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid()).child("postID");
+        pDatabase = FirebaseDatabase.getInstance().getReference().child("Posts");
+        postIDList = new ArrayList<>();
+        postList = new ArrayList<>();
 
-
-        rvPost = (RecyclerView)findViewById(R.id.rvPost);
-        cvPost = (CardView)findViewById(R.id.cvPost);
+        rvPost = (RecyclerView) findViewById(R.id.rvPost);
+        cvPost = (CardView) findViewById(R.id.cvPost);
         retrieve();
+        PostAdapter adapter = new PostAdapter(MyHistoryActivity.this);
+        adapter.setData(postListFinal);
+        rvPost.setAdapter(adapter);
         rvPost.setHasFixedSize(true);
         rvPost.setLayoutManager(new LinearLayoutManager(this));
 
     }
+
     @Override
     protected void onStart() {
         super.onStart();
 
 
-}
+    }
 
     public void retrieve() {
         postList = new ArrayList<>();
-        mDatabase.addValueEventListener(new ValueEventListener() {
+
+        ValueEventListener eventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                fetchData(dataSnapshot);
-                findData();
+                for (Object value : dataSnapshot.getChildren()) {
+                    postIDList.add(value.toString());
+                }
+            }
 
-                PostAdapter adapter = new PostAdapter(getParent());
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                adapter.setData(postList);
-                rvPost.setAdapter(adapter);
+            }
+        };
+
+        mDatabase.addValueEventListener(eventListener);
+
+//        mDatabase.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//                for (Object value : dataSnapshot.getChildren()) {
+//                    postIDList.add(value.toString());
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+
+        mDatabase.removeEventListener(eventListener);
+
+
+        pDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot ds : dataSnapshot.getChildren()){
+                    final Post post = ds.getValue(Post.class);
+                    postList.add(post);
+                }
+
+//                final Post post = dataSnapshot.getValue(Post.class);
+//                postList.add(post);
             }
 
             @Override
@@ -76,36 +126,88 @@ public class MyHistoryActivity extends AppCompatActivity {
 
             }
         });
-    }
 
-    private void fetchData(DataSnapshot dataSnapShot) {
-        postIDList = new ArrayList<>();
-        postList = new ArrayList<>();
-            final User post = dataSnapShot.getValue(User.class);
-            for(Object value : post.postID.values()){
-                postIDList.add(value.toString());
+        for (int i = 0; i < postList.size(); i++) {
+            for (int x = 0; x < postIDList.size(); x++) {
+                if (postList.get(i).id.toString().equals(postIDList.get(x).toString())) {
+                    postListFinal.add(postList.get(i));
+                }
+
             }
-    }
-    public void findData(){
-        for(int i = 0; i<postIDList.size(); i++){
-            final int finalI1 = i;
-        pDatabase = FirebaseDatabase.getInstance().getReference().child("Posts").child(postIDList.get(finalI1));
-            pDatabase.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    final Post post = dataSnapshot.getValue(Post.class);
-                    postList.add(post);
+        }
 
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-      }
 
     }
+
+//    private void fetchData(DataSnapshot dataSnapShot) {
+//
+//
+//
+//        pDatabase.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//                for(DataSnapshot ds : dataSnapshot.getChildren()){
+//                    final Post post = ds.getValue(Post.class);
+//                    postList.add(post);
+//                }
+//
+////                final Post post = dataSnapshot.getValue(Post.class);
+////                postList.add(post);
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+//
+//
+//        for (int i = 0; i < postList.size(); i++) {
+//            for (int x = 0; x < postIDList.size(); x++) {
+//                if (postList.get(i).id.toString().equals(postIDList.get(x).toString())) {
+//                    postListFinal.add(postList.get(i));
+//                }
+//
+//            }
+//        }
+//
+//    }
+//
+//    public void findData() {
+//
+//
+//        pDatabase.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//                for(DataSnapshot ds : dataSnapshot.getChildren()){
+//                    final Post post = ds.getValue(Post.class);
+//                    postList.add(post);
+//                }
+//
+////                final Post post = dataSnapshot.getValue(Post.class);
+////                postList.add(post);
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+//
+//
+//        for (int i = 0; i < postList.size(); i++) {
+//            for (int x = 0; x < postIDList.size(); x++) {
+//                if (postList.get(i).id.toString().equals(postIDList.get(x).toString())) {
+//                    postListFinal.add(postList.get(i));
+//                }
+//
+//            }
+//        }
+//
+//
+//    }
 
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -124,7 +226,6 @@ public class MyHistoryActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
     }
-
 
 
 }
