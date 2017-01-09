@@ -298,7 +298,41 @@ public class PostFragment extends android.support.v4.app.Fragment {
 
                 }
             });
+        } else if (!TextUtils.isEmpty(title_val) && !TextUtils.isEmpty(desc_val)) {
+            Calendar c = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd:MMMM:yyyy HH:mm:ss a");
+            final String strDate = sdf.format(c.getTime());
+            final String user_id = auth.getCurrentUser().getUid();
+
+
+            final DatabaseReference newPost = database.push();
+
+            users.child("Name").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String name = dataSnapshot.getValue().toString();
+                    post = new Post(desc_val, strDate, "null", newPost.getKey(), name, title_val, user_id);
+                    newPost.setValue(post).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                progress.dismiss();
+                                //userPost.push().setValue(newPost.getKey());
+                                users.child("postID").push().setValue(newPost.getKey());
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
         }
+
+
 //        } else if (!TextUtils.isEmpty(title_val) && !TextUtils.isEmpty(desc_val)) {
 //
 //            Calendar c = Calendar.getInstance();

@@ -13,11 +13,12 @@ public class User implements Serializable {
 
     public String Image;
     public String Name;
-    public Map<String, Object> favourite = null;
-    public Map<String, Object> postID = null;
+    public Map<String, Boolean> favourite = null;
+    public Map<String, String> postID = null;
 
 
-    public User(){}
+    public User() {
+    }
 
 
     public User(String Image, String Name) {
@@ -25,7 +26,6 @@ public class User implements Serializable {
         this.Name = Name;
 
     }
-
 
 
 }

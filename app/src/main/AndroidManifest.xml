@@ -9,8 +9,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name="com.example.han.tartalk.MyFirebaseApp"
         android:theme="@style/AppTheme">
+        <!--android:name="com.example.han.tartalk.MyFirebaseApp"-->
         <activity
             android:name=".SplashActivity"
             android:theme="@style/SplashTheme">
@@ -27,7 +27,8 @@
         <activity
             android:name=".ResetPasswordActivity"
             android:label="Reset Password" />
-        <activity android:name=".MyHistoryActivity" />
+        <activity android:name=".MyHistoryActivity"
+            android:label="My posts"/>
         <activity
             android:name=".MyCommentActivity"
             android:label="My Comment"

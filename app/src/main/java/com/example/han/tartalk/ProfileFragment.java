@@ -32,6 +32,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static android.R.attr.data;
 import static android.R.attr.name;
@@ -53,7 +54,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
     private TextView textViewNickname;
     private ProgressDialog progressDialog;
     private AlertDialog alertDialog;
-    private DatabaseReference database;
+    private DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Users");
     private ArrayList<String> postIDList;
 
     @Nullable
@@ -130,6 +131,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
                     alertDialog.dismiss();
                     HomeFragment fragment = new HomeFragment();
                     getFragmentManager().beginTransaction().replace(R.id.main_container, new HomeFragment()).commit();
+                    MainActivity.bottomBar.selectTabAtPosition(0, true);
 
                 }
             });
@@ -138,18 +140,24 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         }
         if (mAuth.getCurrentUser() != null) {
 
-
-            database = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
-            postIDList = new ArrayList<>();
-            database.addValueEventListener(new ValueEventListener() {
+            final TextView textViewPost = (TextView) view.findViewById(R.id.textViewPost);
+           //database = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+            database.child(mAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    final User post = dataSnapshot.getValue(User.class);
-//                    textViewNickname.setText(post.Name);
+                    postIDList = new ArrayList<>();
+                    final User u = dataSnapshot.getValue(User.class);
+                    textViewNickname.setText(u.Name);
 
-//                    for (Object value : post.postID.values()) {
-//                        postIDList.add(value.toString());
-//                    }
+                    if (u.postID != null) {
+                        textViewPost.setText(""+u.postID.size());
+                    } else {
+                        textViewPost.setText("" + 0);
+                    }
+
+                    for(String value : u.postID.keySet()){
+                        postIDList.add(u.postID.get(value));
+                    }
 
                 }
 
@@ -174,12 +182,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
 //                }
 //            });
 
-            TextView textViewPost = (TextView) view.findViewById(R.id.textViewPost);
-            if (postIDList.size() > 0) {
-                textViewPost.setText(postIDList.size());
-            } else {
-                textViewPost.setText("" + 0);
-            }
+
 
         }
 
@@ -200,7 +203,12 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
                         startActivity(new Intent(getActivity(), ChangePasswordActivity.class));
                         break;
                     case 1:
-                        startActivity(new Intent(getActivity(), MyHistoryActivity.class));
+                        Intent mypost = new Intent(view.getContext(), MyHistoryActivity.class);
+                        mypost.putExtra("PostID", postIDList );
+                        getContext().startActivity(mypost);
+
+
+//                        startActivity(new Intent(getActivity(), MyHistoryActivity.class));
                         break;
                 }
             }
@@ -249,6 +257,8 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
             from = true;
             mAuth.signOut();
             getFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
+            MainActivity.bottomBar.selectTabAtPosition(0, true);
+
         }
 
     }

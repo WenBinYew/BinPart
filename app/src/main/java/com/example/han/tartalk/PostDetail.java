@@ -3,6 +3,10 @@ package com.example.han.tartalk;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -30,6 +34,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -54,6 +60,7 @@ public class PostDetail extends AppCompatActivity {
     private CommentAdapter adapter;
     private FirebaseAuth auth;
     private FirebaseUser user;
+    private Post post;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +74,7 @@ public class PostDetail extends AppCompatActivity {
         final Intent intent = getIntent();
         final String id = intent.getStringExtra("PostID");
         database = FirebaseDatabase.getInstance().getReference().child("Posts").child(id);
-        databaseComments = FirebaseDatabase.getInstance().getReference().child("Posts").child(id).child("comments");
+        databaseComments = FirebaseDatabase.getInstance().getReference().child("Comments").child(id);
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
@@ -88,25 +95,27 @@ public class PostDetail extends AppCompatActivity {
 
     public void retrieve() {
         commentList = new ArrayList<>();
-        database.addListenerForSingleValueEvent(new ValueEventListener() {
+        database.addValueEventListener(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 //fetchData(dataSnapshot);
-                final Post post = dataSnapshot.getValue(Post.class);
+                post = dataSnapshot.getValue(Post.class);
 
                 databaseComments.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         commentList.clear();
+
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
                             final Comment comment = ds.getValue(Comment.class);
                             commentList.add(comment);
                         }
 
                         //CommentAdapter adapter = new CommentAdapter(PostDetail.this);
-                        rvComment.setAdapter(adapter);
-                        adapter.setData(commentList);
+
+
+
 
                     }
 
@@ -115,6 +124,12 @@ public class PostDetail extends AppCompatActivity {
                         Toast.makeText(PostDetail.this, "Please login", Toast.LENGTH_LONG).show();
                     }
                 });
+                LinearLayoutManager layoutManager = ((LinearLayoutManager) rvComment.getLayoutManager());
+                int firstVisiblePosition = layoutManager.findFirstCompletelyVisibleItemPosition();
+
+                rvComment.setAdapter(adapter);
+                adapter.setData(commentList);
+                rvComment.scrollToPosition(firstVisiblePosition);
 
 
                 View headerView = LayoutInflater.from(PostDetail.this).inflate(R.layout.post_cardview_detail, rvComment, false);
@@ -170,23 +185,9 @@ public class PostDetail extends AppCompatActivity {
                 txtViewPostName.setText(post.name);
                 txtViewTitle.setText(post.title);
                 txtViewContent.setText(post.content);
-
-                if (post.likes != null) {
-                    txtViewLikeCount.setText("" + post.likes.size());
-                } else {
-                    txtViewLikeCount.setText("" + 0);
-                }
-
-                if (post.dislikes != null) {
-                    txtViewDislikeCount.setText("" + post.dislikes.size());
-                } else {
-                    txtViewDislikeCount.setText("" + 0);
-                }
-                if (post.comments != null) {
-                    txtViewCommentCount.setText("" + post.comments.size());
-                } else {
-                    txtViewCommentCount.setText("" + 0);
-                }
+                txtViewLikeCount.setText("" + post.likeCount);
+                txtViewDislikeCount.setText("" + post.dislikeCount);
+                txtViewCommentCount.setText("" + post.commentCount);
 
 
                 if (post.image.toString().equals("null")) {
@@ -205,30 +206,77 @@ public class PostDetail extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         if (auth.getCurrentUser() != null) {
-                            ArrayList<String> check = new ArrayList<String>();
-                            if (post.likes != null) {
-                                for (Object value : post.likes.values()) {
-                                    check.add(value.toString());
-                                }
-                                Boolean done = false;
-                                for (int i = 0; i < check.size(); i++) {
-                                    if (check.get(i).toString().equals(user.getUid())) {
-                                        Toast.makeText(PostDetail.this, "Already liked this post", Toast.LENGTH_SHORT).show();
-                                        done = true;
+                            database.runTransaction(new Transaction.Handler() {
+                                @Override
+                                public Transaction.Result doTransaction(MutableData mutableData) {
+                                    Post p = mutableData.getValue(Post.class);
+                                    if (p == null) {
+
+                                        return Transaction.success(mutableData);
                                     }
-                                }
-                                    if (done = false) {
-                                        int x = post.likes.size();
-                                        txtViewLikeCount.setText("" + (x + 1));
-                                        database.child("likes").push().setValue(user.getUid());
+                                    if (p.likes != null) {
+                                        if (p.likes.containsKey(auth.getCurrentUser().getUid())) {
+                                            // Unstar the post and remove self from stars
+                                            p.likeCount = p.likeCount - 1;
+                                            p.likes.remove(auth.getCurrentUser().getUid());
+
+
+                                        } else {
+                                            // Star the post and add self to stars
+                                            p.likeCount = p.likeCount + 1;
+                                            p.likes.put(auth.getCurrentUser().getUid(), true);
+                                            new CustomTaskLike().execute((Void[]) null);
+
+
+                                        }
+                                    } else {
+                                        p.likes = new HashMap<String, Boolean>();
+                                        p.likeCount = p.likeCount + 1;
+                                        p.likes.put(auth.getCurrentUser().getUid(), true);
+                                        new CustomTaskLike().execute((Void[]) null);
                                     }
-                            } else {
-                                txtViewLikeCount.setText("1");
-                                database.child("likes").push().setValue(user.getUid());
-                            }
+
+                                    // Set value and report transaction success
+                                    mutableData.setValue(p);
+                                    return Transaction.success(mutableData);
+                                }
+
+                                @Override
+                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                                    Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+                                }
+                            });
+
+
                         } else {
-                            Toast.makeText(PostDetail.this, "Please login to dislike post", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(PostDetail.this, "Please login to like post", Toast.LENGTH_SHORT).show();
                         }
+
+//                        if (auth.getCurrentUser() != null) {
+//                            ArrayList<String> check = new ArrayList<String>();
+//                            if (post.likes != null) {
+//                                for (Object value : post.likes.values()) {
+//                                    check.add(value.toString());
+//                                }
+//                                Boolean done = false;
+//                                for (int i = 0; i < check.size(); i++) {
+//                                    if (check.get(i).toString().equals(user.getUid())) {
+//                                        Toast.makeText(PostDetail.this, "Already liked this post", Toast.LENGTH_SHORT).show();
+//                                        done = true;
+//                                    }
+//                                }
+//                                    if (done = false) {
+//                                        int x = post.likes.size();
+//                                        txtViewLikeCount.setText("" + (x + 1));
+//                                        database.child("likes").push().setValue(user.getUid());
+//                                    }
+//                            } else {
+//                                txtViewLikeCount.setText("1");
+//                                database.child("likes").push().setValue(user.getUid());
+//                            }
+//                        } else {
+//                            Toast.makeText(PostDetail.this, "Please login to dislike post", Toast.LENGTH_SHORT).show();
+//                        }
                     }
 
                 });
@@ -266,35 +314,52 @@ public class PostDetail extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         if (auth.getCurrentUser() != null) {
-                            ArrayList<String> check = new ArrayList<String>();
-                            if (post.dislikes != null) {
-                                for (Object value : post.dislikes.values()) {
-                                    check.add(value.toString());
-                                }
+                            database.runTransaction(new Transaction.Handler() {
+                                @Override
+                                public Transaction.Result doTransaction(MutableData mutableData) {
+                                    Post p = mutableData.getValue(Post.class);
+                                    if (p == null) {
 
-                                boolean done = false;
+                                        return Transaction.success(mutableData);
+                                    }
+                                    if (p.dislikes != null) {
+                                        if (p.dislikes.containsKey(auth.getCurrentUser().getUid())) {
+                                            // Unstar the post and remove self from stars
+                                            p.dislikeCount = p.dislikeCount - 1;
+                                            p.dislikes.remove(auth.getCurrentUser().getUid());
 
-                                for (int i = 0; i < check.size(); i++) {
-                                    if (check.get(i).toString().equals(user.getUid())) {
-                                        Toast.makeText(PostDetail.this, "Already disliked this post", Toast.LENGTH_SHORT).show();
-                                        done = true;
+
+                                        } else {
+                                            // Star the post and add self to stars
+                                            p.dislikeCount = p.dislikeCount + 1;
+                                            p.dislikes.put(auth.getCurrentUser().getUid(), true);
+                                            new CustomTaskDislike().execute((Void[]) null);
+
+
+                                        }
+                                    } else {
+                                        p.dislikes = new HashMap<String, Boolean>();
+                                        p.dislikeCount = p.dislikeCount + 1;
+                                        p.dislikes.put(auth.getCurrentUser().getUid(), true);
+                                        new CustomTaskDislike().execute((Void[]) null);
                                     }
 
+                                    // Set value and report transaction success
+                                    mutableData.setValue(p);
+                                    return Transaction.success(mutableData);
                                 }
-                                if (done = false) {
-                                    int x = post.dislikes.size();
-                                    txtViewDislikeCount.setText("" + (x + 1));
-                                    database.child("dislikes").push().setValue(user.getUid());
+
+                                @Override
+                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                                    Log.d(TAG, "postTransaction:onComplete:" + databaseError);
                                 }
-                            } else {
-                                txtViewDislikeCount.setText("1");
-                                database.child("dislikes").push().setValue(user.getUid());
-                            }
+                            });
+
+
                         } else {
                             Toast.makeText(PostDetail.this, "Please login to dislike post", Toast.LENGTH_SHORT).show();
                         }
                     }
-
                 });
 
 
@@ -360,47 +425,47 @@ public class PostDetail extends AppCompatActivity {
                 });
 
 
-                btnFavourite.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (auth.getCurrentUser() != null) {
-                            final ArrayList<String> check = new ArrayList<String>();
-                            databaseFavourite.addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    User user = dataSnapshot.getValue(User.class);
-                                    if (user.favourite != null) {
-                                        for (Object value : user.favourite.values()) {
-                                            check.add(value.toString());
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
-
-                            Boolean done = false;
-                            for (int i = 0; i < check.size(); i++) {
-                                if (check.get(i).toString().equals(post.id)) {
-                                    Toast.makeText(PostDetail.this, "Already favourited this post", Toast.LENGTH_SHORT).show();
-                                    done = true;
-                                }
-                            }
-
-                            if (done = false) {
-                                databaseFavourite.child("favourite").push().setValue(post.id);
-                                Toast.makeText(PostDetail.this, "You have favourited this post", Toast.LENGTH_SHORT).show();
-
-                            }
-
-                        } else {
-                            Toast.makeText(PostDetail.this, "Please login to favourite this post", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+//                btnFavourite.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        if (auth.getCurrentUser() != null) {
+//                            final ArrayList<String> check = new ArrayList<String>();
+//                            databaseFavourite.addValueEventListener(new ValueEventListener() {
+//                                @Override
+//                                public void onDataChange(DataSnapshot dataSnapshot) {
+//                                    User user = dataSnapshot.getValue(User.class);
+//                                    if (user.favourite != null) {
+//                                        for (Object value : user.favourite.values()) {
+//                                            check.add(value.toString());
+//                                        }
+//                                    }
+//                                }
+//
+//                                @Override
+//                                public void onCancelled(DatabaseError databaseError) {
+//
+//                                }
+//                            });
+//
+//                            Boolean done = false;
+//                            for (int i = 0; i < check.size(); i++) {
+//                                if (check.get(i).toString().equals(post.id)) {
+//                                    Toast.makeText(PostDetail.this, "Already favourited this post", Toast.LENGTH_SHORT).show();
+//                                    done = true;
+//                                }
+//                            }
+//
+//                            if (done = false) {
+//                                databaseFavourite.child("favourite").push().setValue(post.id);
+//                                Toast.makeText(PostDetail.this, "You have favourited this post", Toast.LENGTH_SHORT).show();
+//
+//                            }
+//
+//                        } else {
+//                            Toast.makeText(PostDetail.this, "Please login to favourite this post", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                });
 
 
             }
@@ -440,12 +505,39 @@ public class PostDetail extends AppCompatActivity {
     }
 
 
+    private class CustomTaskLike extends AsyncTask<Void, Void, Void> {
 
-//    @Override
-//    public android.support.v4.app.FragmentManager getSupportFragmentManager() {
-//
-//       HomeFragment getView =  (HomeFragment) getSupportFragmentManager().findFragmentById(R.layout.home_fragment);
-//
-//        return super.getSupportFragmentManager();
-//    }
+        protected Void doInBackground(Void... param) {
+            //Do some work
+            return null;
+        }
+
+        protected void onPostExecute(Void param) {
+            Toast.makeText(PostDetail.this, "Liked ", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class CustomTaskDislike extends AsyncTask<Void, Void, Void> {
+
+        protected Void doInBackground(Void... param) {
+            //Do some work
+            return null;
+        }
+
+        protected void onPostExecute(Void param) {
+            Toast.makeText(PostDetail.this, "Disliked ", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class CustomTaskFavourite extends AsyncTask<Void, Void, Void> {
+
+        protected Void doInBackground(Void... param) {
+            //Do some work
+            return null;
+        }
+
+        protected void onPostExecute(Void param) {
+            Toast.makeText(PostDetail.this, "Favourited ", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

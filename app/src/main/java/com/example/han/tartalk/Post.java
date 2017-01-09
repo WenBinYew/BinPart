@@ -3,6 +3,7 @@ package com.example.han.tartalk;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by han on 21/12/2016.
@@ -18,9 +19,12 @@ public class Post implements Serializable {
     public String image;
     public String date;
     public String name;
-    public Map<String, Object> likes;
-    public Map<String, Object> dislikes;
-    public Map<String, Object> comments;
+    public int likeCount = 0;
+    public int dislikeCount = 0;
+    public int commentCount = 0;
+    public Map<String, Boolean> likes = null;
+    public Map<String, Boolean> dislikes = null;
+    public Map<String, Boolean> comments = null;
 
 
 

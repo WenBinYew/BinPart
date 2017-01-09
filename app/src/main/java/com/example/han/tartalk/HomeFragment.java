@@ -35,8 +35,7 @@ public class HomeFragment extends android.support.v4.app.Fragment {
     @InjectView(R.id.elastic_download_view)
     ElasticDownloadView mElasticDownloadView;
 
-    public static RecyclerView rvPost;
-    private CardView cvPost;
+    public RecyclerView rvPost;
     private SwipeRefreshLayout swipeRefresh;
     public static ArrayList<Post> postList = new ArrayList<Post>();
     private DatabaseReference database;
@@ -69,22 +68,22 @@ public class HomeFragment extends android.support.v4.app.Fragment {
 
 
         rvPost = (RecyclerView) v.findViewById(R.id.rvPost);
-        cvPost = (CardView) v.findViewById(R.id.cvPost);
-        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         database = FirebaseDatabase.getInstance().getReference().child("Posts");
         swipeRefresh = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefresh);
-        //retrieve();
+
         rvPost.setHasFixedSize(true);
         final LinearLayoutManager manager = new LinearLayoutManager(getContext());
         rvPost.setLayoutManager(manager);
-        //rvPost.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter =new PostAdapter(getContext());
+        adapter = new PostAdapter(getContext());
+        retrieve();
         rvPost.setAdapter(adapter);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 
             @Override
             public void onRefresh() {
-                retrieve();
+                HomeFragment fragment = new HomeFragment();
+                getFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
+                MainActivity.bottomBar.selectTabAtPosition(0, true);
 
             }
         });
@@ -98,7 +97,7 @@ public class HomeFragment extends android.support.v4.app.Fragment {
             public void run() {
                 mElasticDownloadView.success();
             }
-        }, ProgressDownloadView.ANIMATION_DURATION_BASE);
+        }, 2 * ProgressDownloadView.ANIMATION_DURATION_BASE);
 
         return v;
     }
@@ -110,22 +109,35 @@ public class HomeFragment extends android.support.v4.app.Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-               // int position = rvPost.getChildAdapterPosition();
-//                    int position = rvPost.view
-//                if(position <= 0){
-//                    rvPost.smoothScrollToPosition(0);
-//                }else{
-//                    rvPost.smoothScrollToPosition(position);
-//                }
 
                 fetchData(dataSnapshot);
-                LinearLayoutManager layoutManager = ((LinearLayoutManager)rvPost.getLayoutManager());
+
+                LinearLayoutManager layoutManager = ((LinearLayoutManager) rvPost.getLayoutManager());
                 int firstVisiblePosition = layoutManager.findFirstCompletelyVisibleItemPosition();
-                rvPost.scrollToPosition(firstVisiblePosition);
-                rvPost.setAdapter(adapter);
+
+                // Toast.makeText(getContext(), ""+firstVisiblePosition , Toast.LENGTH_SHORT).show();
+                adapter = new PostAdapter(getContext());
                 adapter.setData(postList);
+                rvPost.setAdapter(adapter);
+//                if(firstVisiblePosition != 0){
+//                    rvPost.scrollToPosition(firstVisiblePosition);
+//                }else{
+//                    rvPost.scrollToPosition(0);
+//                }
+//
+                rvPost.scrollToPosition(firstVisiblePosition);
                 swipeRefresh.setRefreshing(false);
                 mElasticDownloadView.setVisibility(View.INVISIBLE);
+
+
+//                fetchData(dataSnapshot);
+//                PostAdapter adapter = new PostAdapter(getContext());
+//
+//
+//                rvPost.setAdapter(adapter);
+//                adapter.setData(postList);
+//                swipeRefresh.setRefreshing(false);
+//                mElasticDownloadView.setVisibility(View.INVISIBLE);
 
             }
 
@@ -152,35 +164,5 @@ public class HomeFragment extends android.support.v4.app.Fragment {
         }
 
     }
-
-//
-//    public static int getCenterXChildPosition(RecyclerView recyclerView) {
-//        int childCount = recyclerView.getChildCount();
-//        if (childCount > 0) {
-//            for (int i = 0; i < childCount; i++) {
-//                View child = recyclerView.getChildAt(i);
-//                if (isChildInCenterX(recyclerView, child)) {
-//                    return recyclerView.getChildAdapterPosition(child);
-//                }
-//            }
-//        }
-//        return childCount;
-//    }
-//
-//    public static boolean isChildInCenterX(RecyclerView recyclerView, View view) {
-//        int childCount = recyclerView.getChildCount();
-//        int[] lvLocationOnScreen = new int[2];
-//        int[] vLocationOnScreen = new int[2];
-//        recyclerView.getLocationOnScreen(lvLocationOnScreen);
-//        int middleX = lvLocationOnScreen[0] + recyclerView.getWidth() / 2;
-//        if (childCount > 0) {
-//            view.getLocationOnScreen(vLocationOnScreen);
-//            if (vLocationOnScreen[0] <= middleX && vLocationOnScreen[0] + view.getWidth() >= middleX) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
 
 }

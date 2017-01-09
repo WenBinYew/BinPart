@@ -2,6 +2,7 @@ package com.example.han.tartalk;
 
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -29,12 +30,10 @@ import java.util.ArrayList;
 public class MyHistoryActivity extends AppCompatActivity {
 
     private RecyclerView rvPost;
-    private CardView cvPost;
     private DatabaseReference mDatabase;
     private DatabaseReference pDatabase;
-    private ArrayList<Post> postList = new ArrayList<Post>();
+    private ArrayList<Post> postList = HomeFragment.postList;
     private ArrayList<Post> postListFinal = new ArrayList<Post>();
-    ;
     private ArrayList<String> postIDList;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
@@ -45,21 +44,42 @@ public class MyHistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_history);
 
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid()).child("postID");
-        pDatabase = FirebaseDatabase.getInstance().getReference().child("Posts");
-        postIDList = new ArrayList<>();
-        postList = new ArrayList<>();
+        final Intent intent = getIntent();
+        postIDList = intent.getStringArrayListExtra("PostID");
 
-        rvPost = (RecyclerView) findViewById(R.id.rvPost);
-        cvPost = (CardView) findViewById(R.id.cvPost);
-        retrieve();
+
+        for (int i = 0; i < postList.size(); i++) {
+            for (int x = 0; x < postIDList.size(); x++) {
+                if (postList.get(i).id.equals(postIDList.get(x))) {
+                    postListFinal.add(postList.get(i));
+                }
+
+            }
+        }
+
+
+        rvPost = (RecyclerView) findViewById(R.id.rvPostHistory);
         PostAdapter adapter = new PostAdapter(MyHistoryActivity.this);
         adapter.setData(postListFinal);
-        rvPost.setAdapter(adapter);
         rvPost.setHasFixedSize(true);
         rvPost.setLayoutManager(new LinearLayoutManager(this));
+        rvPost.setAdapter(adapter);
+
+
+//        mAuth = FirebaseAuth.getInstance();
+//        mUser = mAuth.getCurrentUser();
+//        mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid()).child("postID");
+//        pDatabase = FirebaseDatabase.getInstance().getReference().child("Posts");
+//        postIDList = new ArrayList<>();
+//        postList = new ArrayList<>();
+//
+//        rvPost = (RecyclerView) findViewById(R.id.rvPostHistory);
+//        retrieve();
+//        PostAdapter adapter = new PostAdapter(MyHistoryActivity.this);
+//        adapter.setData(postListFinal);
+//        rvPost.setAdapter(adapter);
+//        rvPost.setHasFixedSize(true);
+//        rvPost.setLayoutManager(new LinearLayoutManager(this));
 
     }
 

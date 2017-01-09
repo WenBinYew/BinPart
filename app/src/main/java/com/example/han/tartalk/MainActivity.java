@@ -26,7 +26,7 @@ import is.arontibo.library.ElasticDownloadView;
 import is.arontibo.library.ProgressDownloadView;
 
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends AppCompatActivity {
 
 
     public static BottomBar bottomBar;
