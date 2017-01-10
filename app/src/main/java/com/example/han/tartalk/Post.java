@@ -12,7 +12,7 @@ import java.util.Objects;
 public class Post implements Serializable {
 
 
-    public String id;
+    public String id = null;
     public String content;
     public String uid;
     public String title;

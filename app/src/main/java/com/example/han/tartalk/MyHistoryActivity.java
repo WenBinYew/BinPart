@@ -59,27 +59,13 @@ public class MyHistoryActivity extends AppCompatActivity {
 
 
         rvPost = (RecyclerView) findViewById(R.id.rvPostHistory);
-        PostAdapter adapter = new PostAdapter(MyHistoryActivity.this);
+        PostAdapterClean adapter = new PostAdapterClean(MyHistoryActivity.this);
         adapter.setData(postListFinal);
         rvPost.setHasFixedSize(true);
         rvPost.setLayoutManager(new LinearLayoutManager(this));
         rvPost.setAdapter(adapter);
 
 
-//        mAuth = FirebaseAuth.getInstance();
-//        mUser = mAuth.getCurrentUser();
-//        mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid()).child("postID");
-//        pDatabase = FirebaseDatabase.getInstance().getReference().child("Posts");
-//        postIDList = new ArrayList<>();
-//        postList = new ArrayList<>();
-//
-//        rvPost = (RecyclerView) findViewById(R.id.rvPostHistory);
-//        retrieve();
-//        PostAdapter adapter = new PostAdapter(MyHistoryActivity.this);
-//        adapter.setData(postListFinal);
-//        rvPost.setAdapter(adapter);
-//        rvPost.setHasFixedSize(true);
-//        rvPost.setLayoutManager(new LinearLayoutManager(this));
 
     }
 
@@ -132,7 +118,7 @@ public class MyHistoryActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                for(DataSnapshot ds : dataSnapshot.getChildren()){
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     final Post post = ds.getValue(Post.class);
                     postList.add(post);
                 }

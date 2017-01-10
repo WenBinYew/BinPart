@@ -13,7 +13,10 @@ public class Comment {
     public String date;
     public String name;
     public String id;
-    public Map<String, Object> likes;
-    public Map<String, Object> dislikes;
+    public String postid;
+    public int likeCount = 0;
+    public int dislikeCount = 0;
+    public Map<String, Boolean> likes = null;
+    public Map<String, Boolean> dislikes = null;
 
 }

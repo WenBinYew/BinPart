@@ -169,7 +169,7 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
                                 final String strDate = sdf.format(c.getTime());
                                 final Comment comment = new Comment();
 
-                                final DatabaseReference newComment = databaseComments.push();
+                                final DatabaseReference newComment = databaseComments.child(getData().get(position).id).push();
 
                                 databasePosts.child(getData().get(position).id).runTransaction(new Transaction.Handler() {
                                     @Override
@@ -184,7 +184,7 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
                                         } else {
                                             p.comments = new HashMap<String, Boolean>();
                                             p.commentCount = p.commentCount + 1;
-                                            p.comments.put(newComment.getKey(), true);
+                                            p.comments.put(newComment.getKey() , true);
                                         }
 
                                         // Set value and report transaction success
@@ -203,8 +203,9 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
                                 comment.uid = getData().get(position).uid;
                                 comment.name = getData().get(position).name;
                                 comment.id = newComment.getKey();
+                                comment.postid = getData().get(position).id;
 
-                                newComment.child(getData().get(position).id).setValue(comment).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                newComment.setValue(comment).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
@@ -350,7 +351,7 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
                             if (u.favourite != null) {
                                 if (u.favourite.containsKey(getData().get(position).id)) {
                                     u.favourite.remove(getData().get(position).id);
-
+                                    new CustomTaskUnFavourite().execute((Void[]) null);
 
                                 } else {
 
@@ -533,7 +534,7 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
             cvPost = (CardView) itemView.findViewById(R.id.cvPost);
             rvPost = (RecyclerView) itemView.findViewById(R.id.rvPost);
             txtViewContent = (TextView) itemView.findViewById(R.id.txtViewContent);
-            txtViewID = (TextView) itemView.findViewById(R.id.txtViewPostID);
+            //txtViewID = (TextView) itemView.findViewById(R.id.txtViewPostID);
             txtViewDate = (TextView) itemView.findViewById(R.id.txtViewPostDate);
             txtViewPostName = (TextView) itemView.findViewById(R.id.txtViewPostName);
             txtViewTitle = (TextView) itemView.findViewById(R.id.txtViewTitle);
@@ -630,6 +631,18 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
 
         protected void onPostExecute(Void param) {
             Toast.makeText(mContext, "Favourited ", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class CustomTaskUnFavourite extends AsyncTask<Void, Void, Void> {
+
+        protected Void doInBackground(Void... param) {
+            //Do some work
+            return null;
+        }
+
+        protected void onPostExecute(Void param) {
+            Toast.makeText(mContext, "Unfavourited ", Toast.LENGTH_SHORT).show();
         }
     }
 }

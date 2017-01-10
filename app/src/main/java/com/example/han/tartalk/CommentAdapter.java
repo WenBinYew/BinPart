@@ -2,8 +2,10 @@ package com.example.han.tartalk;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +17,12 @@ import android.widget.Toast;
 import com.google.android.gms.vision.text.Text;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
@@ -24,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.TimeZone;
 
 /**
@@ -32,9 +39,9 @@ import java.util.TimeZone;
 
 class CommentAdapter extends HFRecyclerViewAdapter<Comment, CommentAdapter.CommentViewHolder> {
 
-    // private DatabaseReference databaseComments;
+    private DatabaseReference databaseComments = FirebaseDatabase.getInstance().getReference().child("Comments");
     //public String postID;
-
+    private static final String TAG = "Comment Adapter";
     private FirebaseAuth auth;
     private FirebaseUser user;
 
@@ -45,7 +52,7 @@ class CommentAdapter extends HFRecyclerViewAdapter<Comment, CommentAdapter.Comme
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
-        //DatabaseReference databaseComments = FirebaseDatabase.getInstance().getReference().child("Post");
+        //databaseComments = FirebaseDatabase.getInstance().getReference().child("Comments");
         //DatabaseReference databasePost = FirebaseDatabase.getInstance().getReference().child("Post");
         //databaseComments = FirebaseDatabase.getInstance().getReference().child("Posts").child(postID).child("comments");
 
@@ -61,8 +68,6 @@ class CommentAdapter extends HFRecyclerViewAdapter<Comment, CommentAdapter.Comme
 
     @Override
     public CommentViewHolder onCreateDataItemViewHolder(ViewGroup parent, int viewType) {
-        // LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-
 
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_comment, parent, false);
 
@@ -107,50 +112,55 @@ class CommentAdapter extends HFRecyclerViewAdapter<Comment, CommentAdapter.Comme
         }
 
 
-        if (getData().get(position).dislikes != null) {
-            holder.txtViewDislikeCountComment.setText("" + getData().get(position).dislikes.size());
-        } else {
-            holder.txtViewDislikeCountComment.setText("" + 0);
-        }
 
-        if (getData().get(position).likes != null) {
-            holder.txtViewLikeCountComment.setText("" + getData().get(position).likes.size());
-        } else {
-            holder.txtViewLikeCountComment.setText("" + 0);
-        }
-
+        holder.txtViewLikeCountComment.setText("" + getData().get(position).likeCount);
+        holder.txtViewDislikeCountComment.setText("" + getData().get(position).dislikeCount);
 
         holder.btnLikeComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 if (auth.getCurrentUser() != null) {
-                    ArrayList<String> check = new ArrayList<String>();
-                    if (getData().get(position).likes != null) {
-                        for (Object value : getData().get(position).likes.values()) {
-                            check.add(value.toString());
-                        }
-                        Boolean done = false;
-                        for (int i = 0; i < check.size(); i++) {
-                            if (check.get(i).toString().equals(getData().get(position).uid)) {
-                                Toast.makeText(mContext, "Already liked this comment", Toast.LENGTH_SHORT).show();
-                                done = true;
+                    databaseComments.child(getData().get(position).postid).child(getData().get(position).id).runTransaction(new Transaction.Handler() {
+                        @Override
+                        public Transaction.Result doTransaction(MutableData mutableData) {
+                            Comment c = mutableData.getValue(Comment.class);
+                            if (c == null) {
+
+                                return Transaction.success(mutableData);
                             }
+                            if (c.likes != null) {
+                                if (c.likes.containsKey(auth.getCurrentUser().getUid())) {
+
+                                    c.likeCount = c.likeCount - 1;
+                                    c.likes.remove(auth.getCurrentUser().getUid());
+
+
+                                } else {
+
+                                    c.likeCount = c.likeCount + 1;
+                                    c.likes.put(auth.getCurrentUser().getUid(), true);
+                                    new CustomTaskLike().execute((Void[]) null);
+
+                                }
+                            } else {
+                                c.likes = new HashMap<String, Boolean>();
+                                c.likeCount = c.likeCount + 1;
+                                c.likes.put(auth.getCurrentUser().getUid(), true);
+                                new CustomTaskLike().execute((Void[]) null);
+                            }
+
+                            mutableData.setValue(c);
+                            return Transaction.success(mutableData);
                         }
-                        if (done = false) {
-//                            int x = getData().get(position).likes.size();
-//                            holder.txtViewLikeCountComment.setText("" + (x + 1));
-                            PostDetail.databaseComments.child(getData().get(position).id).child("likes").push().setValue(user.getUid());
-                            PostDetail.rvComment.smoothScrollToPosition(position);
 
+                        @Override
+                        public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                            Log.d(TAG, "postTransaction:onComplete:" + databaseError);
                         }
+                    });
 
-                    } else {
 
-                        //holder.txtViewLikeCountComment.setText("1");
-                        PostDetail.databaseComments.child(getData().get(position).id).child("likes").push().setValue(user.getUid());
-                        PostDetail.rvComment.smoothScrollToPosition(position);
-                    }
                 } else {
                     Toast.makeText(mContext, "Please login to like comment", Toast.LENGTH_SHORT).show();
                 }
@@ -163,33 +173,48 @@ class CommentAdapter extends HFRecyclerViewAdapter<Comment, CommentAdapter.Comme
             public void onClick(View view) {
 
                 if (auth.getCurrentUser() != null) {
-                    ArrayList<String> check = new ArrayList<String>();
-                    if (getData().get(position).dislikes != null) {
-                        for (Object value : getData().get(position).dislikes.values()) {
-                            check.add(value.toString());
-                        }
-                        Boolean done = false;
-                        for (int i = 0; i < check.size(); i++) {
-                            if (check.get(i).toString().equals(getData().get(position).uid)) {
-                                Toast.makeText(mContext, "Already disliked this comment", Toast.LENGTH_SHORT).show();
-                                done = true;
+                    databaseComments.child(getData().get(position).postid).child(getData().get(position).id).runTransaction(new Transaction.Handler() {
+                        @Override
+                        public Transaction.Result doTransaction(MutableData mutableData) {
+                            Comment c = mutableData.getValue(Comment.class);
+                            if (c == null) {
+
+                                return Transaction.success(mutableData);
                             }
+                            if (c.dislikes != null) {
+                                if (c.dislikes.containsKey(auth.getCurrentUser().getUid())) {
+
+                                    c.dislikeCount = c.dislikeCount - 1;
+                                    c.dislikes.remove(auth.getCurrentUser().getUid());
+
+
+                                } else {
+
+                                    c.dislikeCount = c.dislikeCount + 1;
+                                    c.dislikes.put(auth.getCurrentUser().getUid(), true);
+                                    new CustomTaskDislike().execute((Void[]) null);
+
+                                }
+                            } else {
+                                c.dislikes = new HashMap<String, Boolean>();
+                                c.dislikeCount = c.dislikeCount + 1;
+                                c.dislikes.put(auth.getCurrentUser().getUid(), true);
+                                new CustomTaskDislike().execute((Void[]) null);
+                            }
+
+                            mutableData.setValue(c);
+                            return Transaction.success(mutableData);
                         }
 
-                        if (done = false) {
-//                            int x = getData().get(position).dislikes.size();
-//                            holder.txtViewDislikeCountComment.setText("" + (x + 1));
-                            PostDetail.databaseComments.child(getData().get(position).id).child("dislikes").push().setValue(user.getUid());
-                            PostDetail.rvComment.smoothScrollToPosition(position);
+                        @Override
+                        public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                            Log.d(TAG, "postTransaction:onComplete:" + databaseError);
                         }
-                    } else {
+                    });
 
-//                        holder.txtViewDislikeCountComment.setText("1");
-                        PostDetail.databaseComments.child(getData().get(position).id).child("dislikes").push().setValue(user.getUid());
-                        PostDetail.rvComment.smoothScrollToPosition(position);
-                    }
+
                 } else {
-                    Toast.makeText(mContext, "Please login to dislike comment", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "Please login to dislike post", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -245,6 +270,31 @@ class CommentAdapter extends HFRecyclerViewAdapter<Comment, CommentAdapter.Comme
             daysBetween++;
         }
         return daysBetween;
+    }
+
+
+    private class CustomTaskLike extends AsyncTask<Void, Void, Void> {
+
+        protected Void doInBackground(Void... param) {
+            //Do some work
+            return null;
+        }
+
+        protected void onPostExecute(Void param) {
+            Toast.makeText(mContext, "Liked ", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class CustomTaskDislike extends AsyncTask<Void, Void, Void> {
+
+        protected Void doInBackground(Void... param) {
+            //Do some work
+            return null;
+        }
+
+        protected void onPostExecute(Void param) {
+            Toast.makeText(mContext, "Disliked ", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

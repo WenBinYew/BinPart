@@ -75,26 +75,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toEndOf="@+id/btnLikeComment" />
 
-            <TextView
-                android:id="@+id/txtViewDislikeCountComment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="20dp"
-                android:text="10"
-                android:layout_alignBaseline="@+id/btnDisikeComment"
-                android:layout_alignBottom="@+id/btnDisikeComment"
-                android:layout_toEndOf="@+id/btnDisikeComment" />
-
-            <ImageView
-                android:id="@+id/imageDot1"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:layout_marginLeft="5dp"
-                android:layout_alignTop="@+id/imageDot"
-                android:layout_toEndOf="@+id/txtViewLikeCountComment" />
-            <!--android:src="@drawable/ic_dot"-->
             <Button
                 android:id="@+id/btnLikeComment"
                 android:layout_width="wrap_content"
@@ -107,6 +87,18 @@
                 android:layout_alignBaseline="@+id/txtViewLikeCountComment"
                 android:layout_alignBottom="@+id/txtViewLikeCountComment"
                 android:layout_toEndOf="@+id/imageDot" />
+
+            <TextView
+                android:id="@+id/txtViewDislikeCountComment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="20dp"
+                android:text="10"
+                android:layout_alignBaseline="@+id/btnDisikeComment"
+                android:layout_alignBottom="@+id/btnDisikeComment"
+                android:layout_toEndOf="@+id/btnDisikeComment" />
 
             <Button
                 android:id="@+id/btnDisikeComment"
@@ -121,6 +113,19 @@
                 android:layout_marginStart="17dp"
                 android:layout_centerVertical="true"
                 android:layout_toEndOf="@+id/imageDot1" />
+
+            <ImageView
+                android:id="@+id/imageDot1"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_alignTop="@+id/imageDot"
+                android:layout_toEndOf="@+id/txtViewLikeCountComment" />
+            <!--android:src="@drawable/ic_dot"-->
+
+
+
+
 
 
         </RelativeLayout>

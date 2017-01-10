@@ -30,6 +30,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.vision.text.Text;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -53,7 +54,6 @@ public class PostDetail extends AppCompatActivity {
     public static RecyclerView rvComment;
     private DatabaseReference database;
     public static DatabaseReference databaseComments;
-    private DatabaseReference databaseFavourite;
     private ArrayList<Comment> commentList = new ArrayList<Comment>();
     private static final String TAG = "Post Detail Activity";
     private SwipeRefreshLayout swipeRefreshPostDetail;
@@ -61,6 +61,7 @@ public class PostDetail extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseUser user;
     private Post post;
+    private DatabaseReference databaseFavourite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,13 +76,9 @@ public class PostDetail extends AppCompatActivity {
         final String id = intent.getStringExtra("PostID");
         database = FirebaseDatabase.getInstance().getReference().child("Posts").child(id);
         databaseComments = FirebaseDatabase.getInstance().getReference().child("Comments").child(id);
+        databaseFavourite = FirebaseDatabase.getInstance().getReference().child("Users");
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
-
-        if (user != null) {
-            databaseFavourite = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
-        }
-        //databaseFavourite = FirebaseDatabase.getInstance().getReference().child("Users").child();
 
         rvComment.setHasFixedSize(true);
         rvComment.setLayoutManager(new LinearLayoutManager(this));
@@ -110,25 +107,22 @@ public class PostDetail extends AppCompatActivity {
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
                             final Comment comment = ds.getValue(Comment.class);
                             commentList.add(comment);
+                            adapter.setData(commentList);
                         }
-
-                        //CommentAdapter adapter = new CommentAdapter(PostDetail.this);
-
-
-
-
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        Toast.makeText(PostDetail.this, "Please login", Toast.LENGTH_LONG).show();
+                        Toast.makeText(PostDetail.this, "Please login", Toast.LENGTH_SHORT).show();
                     }
                 });
+
+
                 LinearLayoutManager layoutManager = ((LinearLayoutManager) rvComment.getLayoutManager());
                 int firstVisiblePosition = layoutManager.findFirstCompletelyVisibleItemPosition();
-
+                //adapter.setData(commentList);
                 rvComment.setAdapter(adapter);
-                adapter.setData(commentList);
+
                 rvComment.scrollToPosition(firstVisiblePosition);
 
 
@@ -366,7 +360,6 @@ public class PostDetail extends AppCompatActivity {
                 btnComment.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-
                         if (auth.getCurrentUser() != null) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(PostDetail.this);
                             View v = LayoutInflater.from(PostDetail.this).inflate(R.layout.post_comment_dialog, null);
@@ -387,27 +380,49 @@ public class PostDetail extends AppCompatActivity {
                                         final String strDate = sdf.format(c.getTime());
                                         final Comment comment = new Comment();
 
-
                                         final DatabaseReference newComment = databaseComments.push();
+
+                                        database.runTransaction(new Transaction.Handler() {
+                                            @Override
+                                            public Transaction.Result doTransaction(MutableData mutableData) {
+                                                Post p = mutableData.getValue(Post.class);
+                                                if (p == null) {
+                                                    return Transaction.success(mutableData);
+                                                }
+                                                if (p.comments != null) {
+                                                    p.commentCount = p.commentCount + 1;
+                                                    p.comments.put(newComment.getKey(), true);
+                                                } else {
+                                                    p.comments = new HashMap<String, Boolean>();
+                                                    p.commentCount = p.commentCount + 1;
+                                                    p.comments.put(newComment.getKey(), true);
+                                                }
+
+                                                // Set value and report transaction success
+                                                mutableData.setValue(p);
+                                                return Transaction.success(mutableData);
+                                            }
+
+                                            @Override
+                                            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                                                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+                                            }
+                                        });
 
                                         comment.comment = txtComment.getText().toString();
                                         comment.date = strDate;
                                         comment.uid = post.uid;
                                         comment.name = post.name;
                                         comment.id = newComment.getKey();
+                                        comment.postid = post.id;
 
                                         newComment.setValue(comment).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-
+                                                    //HomeFragment.rvPost.smoothScrollToPosition(position);
                                                     Toast.makeText(PostDetail.this, "Successfully commented!", Toast.LENGTH_SHORT).show();
                                                     dialog.dismiss();
-                                                    if (post.comments != null) {
-                                                        txtViewCommentCount.setText("" + (post.comments.size() + 1));
-                                                    } else {
-                                                        txtViewCommentCount.setText("1");
-                                                    }
 
                                                 }
                                             }
@@ -417,17 +432,115 @@ public class PostDetail extends AppCompatActivity {
                                     }
                                 }
                             });
+
+
                         } else {
                             Toast.makeText(PostDetail.this, "Please login to post comment!", Toast.LENGTH_SHORT).show();
                         }
+//                        if (auth.getCurrentUser() != null) {
+//                            AlertDialog.Builder builder = new AlertDialog.Builder(PostDetail.this);
+//                            View v = LayoutInflater.from(PostDetail.this).inflate(R.layout.post_comment_dialog, null);
+//                            final EditText txtComment = (EditText) v.findViewById(R.id.editTxtComments);
+//                            Button postComment = (Button) v.findViewById(R.id.btnPostComment);
+//
+//                            builder.setView(v);
+//                            final AlertDialog dialog = builder.create();
+//                            dialog.show();
+//
+//                            postComment.setOnClickListener(new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View view) {
+//                                    if (!txtComment.getText().toString().isEmpty()) {
+//
+//                                        final Calendar c = Calendar.getInstance();
+//                                        SimpleDateFormat sdf = new SimpleDateFormat("dd:MMMM:yyyy HH:mm:ss a");
+//                                        final String strDate = sdf.format(c.getTime());
+//                                        final Comment comment = new Comment();
+//
+//
+//                                        final DatabaseReference newComment = databaseComments.push();
+//
+//                                        comment.comment = txtComment.getText().toString();
+//                                        comment.date = strDate;
+//                                        comment.uid = post.uid;
+//                                        comment.name = post.name;
+//                                        comment.id = newComment.getKey();
+//
+//                                        newComment.setValue(comment).addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                            @Override
+//                                            public void onComplete(@NonNull Task<Void> task) {
+//                                                if (task.isSuccessful()) {
+//
+//                                                    Toast.makeText(PostDetail.this, "Successfully commented!", Toast.LENGTH_SHORT).show();
+//                                                    dialog.dismiss();
+//                                                    if (post.comments != null) {
+//                                                        txtViewCommentCount.setText("" + (post.comments.size() + 1));
+//                                                    } else {
+//                                                        txtViewCommentCount.setText("1");
+//                                                    }
+//
+//                                                }
+//                                            }
+//                                        });
+//
+//
+//                                    }
+//                                }
+//                            });
+//                        } else {
+//                            Toast.makeText(PostDetail.this, "Please login to post comment!", Toast.LENGTH_SHORT).show();
+//                        }
 
                     }
                 });
 
 
-//                btnFavourite.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
+                btnFavourite.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (auth.getCurrentUser() != null) {
+                            databaseFavourite.child(user.getUid()).runTransaction(new Transaction.Handler() {
+                                @Override
+                                public Transaction.Result doTransaction(MutableData mutableData) {
+                                    User u = mutableData.getValue(User.class);
+                                    if (u == null) {
+
+                                        return Transaction.success(mutableData);
+
+                                    }
+
+                                    if (u.favourite != null) {
+                                        if (u.favourite.containsKey(post.id)) {
+                                            u.favourite.remove(post.id);
+                                            new CustomTaskUnFavourite().execute((Void[]) null);
+
+                                        } else {
+
+                                            u.favourite.put(post.id, true);
+                                            new CustomTaskFavourite().execute((Void[]) null);
+
+                                        }
+                                    } else {
+                                        u.favourite = new HashMap<String, Boolean>();
+                                        u.favourite.put(post.id, true);
+                                        new CustomTaskFavourite().execute((Void[]) null);
+                                    }
+
+                                    // Set value and report transaction success
+                                    mutableData.setValue(u);
+                                    return Transaction.success(mutableData);
+                                }
+
+                                @Override
+                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                                    Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+                                }
+                            });
+
+                        } else {
+                            Toast.makeText(PostDetail.this, "Please login to favourite post", Toast.LENGTH_SHORT).show();
+                        }
+
 //                        if (auth.getCurrentUser() != null) {
 //                            final ArrayList<String> check = new ArrayList<String>();
 //                            databaseFavourite.addValueEventListener(new ValueEventListener() {
@@ -464,8 +577,8 @@ public class PostDetail extends AppCompatActivity {
 //                        } else {
 //                            Toast.makeText(PostDetail.this, "Please login to favourite this post", Toast.LENGTH_SHORT).show();
 //                        }
-//                    }
-//                });
+                    }
+                });
 
 
             }
@@ -538,6 +651,18 @@ public class PostDetail extends AppCompatActivity {
 
         protected void onPostExecute(Void param) {
             Toast.makeText(PostDetail.this, "Favourited ", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class CustomTaskUnFavourite extends AsyncTask<Void, Void, Void> {
+
+        protected Void doInBackground(Void... param) {
+            //Do some work
+            return null;
+        }
+
+        protected void onPostExecute(Void param) {
+            Toast.makeText(PostDetail.this, "Unfavourited ", Toast.LENGTH_SHORT).show();
         }
     }
 }

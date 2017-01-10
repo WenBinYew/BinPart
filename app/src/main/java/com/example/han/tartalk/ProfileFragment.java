@@ -204,7 +204,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
                         break;
                     case 1:
                         Intent mypost = new Intent(view.getContext(), MyHistoryActivity.class);
-                        mypost.putExtra("PostID", postIDList );
+                        mypost.putStringArrayListExtra("PostID", postIDList );
                         getContext().startActivity(mypost);
 
 
