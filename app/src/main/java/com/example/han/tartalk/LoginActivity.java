@@ -42,10 +42,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-//        if(firebaseAuth.getCurrentUser() != null){
-//            finish();
-//            startActivity(new Intent(getApplicationContext(),MainActivity.class));
-//        }
 
         progressDialog = new ProgressDialog(this);
 
@@ -68,12 +64,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String password = editTextPassword.getText().toString().trim();
 
         if(TextUtils.isEmpty(email)){
-            //email is empty
             Toast.makeText(this, "Please enter email", Toast.LENGTH_SHORT).show();
             return;
         }
         if(TextUtils.isEmpty(password)){
-            //password is empty
             Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -127,7 +121,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             }
             if(view == textViewRegister){
-                //will open login activity activity
                 finish();
                 startActivity(new Intent(this,SignUpActivity.class));
             }

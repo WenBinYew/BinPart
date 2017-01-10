@@ -6,9 +6,6 @@ import android.view.View;
 
 import java.util.ArrayList;
 
-/**
- * Created by han on 22/12/2016.
- */
 
 public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -37,14 +34,6 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
     public ArrayList<T> getData() {
         return mList;
     }
-
-//    public void setData(T[] list) {
-//        ArrayList<T> arrayList = new ArrayList<>(list.length);
-//        for (T t : list) {
-//            arrayList.add(t);
-//        }
-//        setData(arrayList);
-//    }
 
 
     public void addData(int position, T item) {

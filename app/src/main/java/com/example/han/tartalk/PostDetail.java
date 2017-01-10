@@ -69,8 +69,6 @@ public class PostDetail extends AppCompatActivity {
         setContentView(R.layout.activity_post_detail);
 
 
-        //swipeRefreshPostDetail = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshPostDetail);
-
         rvComment = (RecyclerView) findViewById(R.id.rvComment);
         final Intent intent = getIntent();
         final String id = intent.getStringExtra("PostID");
@@ -96,7 +94,6 @@ public class PostDetail extends AppCompatActivity {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                //fetchData(dataSnapshot);
                 post = dataSnapshot.getValue(Post.class);
 
                 databaseComments.addValueEventListener(new ValueEventListener() {
@@ -120,7 +117,6 @@ public class PostDetail extends AppCompatActivity {
 
                 LinearLayoutManager layoutManager = ((LinearLayoutManager) rvComment.getLayoutManager());
                 int firstVisiblePosition = layoutManager.findFirstCompletelyVisibleItemPosition();
-                //adapter.setData(commentList);
                 rvComment.setAdapter(adapter);
 
                 rvComment.scrollToPosition(firstVisiblePosition);
@@ -210,13 +206,11 @@ public class PostDetail extends AppCompatActivity {
                                     }
                                     if (p.likes != null) {
                                         if (p.likes.containsKey(auth.getCurrentUser().getUid())) {
-                                            // Unstar the post and remove self from stars
                                             p.likeCount = p.likeCount - 1;
                                             p.likes.remove(auth.getCurrentUser().getUid());
 
 
                                         } else {
-                                            // Star the post and add self to stars
                                             p.likeCount = p.likeCount + 1;
                                             p.likes.put(auth.getCurrentUser().getUid(), true);
                                             new CustomTaskLike().execute((Void[]) null);
@@ -230,7 +224,6 @@ public class PostDetail extends AppCompatActivity {
                                         new CustomTaskLike().execute((Void[]) null);
                                     }
 
-                                    // Set value and report transaction success
                                     mutableData.setValue(p);
                                     return Transaction.success(mutableData);
                                 }
@@ -246,31 +239,6 @@ public class PostDetail extends AppCompatActivity {
                             Toast.makeText(PostDetail.this, "Please login to like post", Toast.LENGTH_SHORT).show();
                         }
 
-//                        if (auth.getCurrentUser() != null) {
-//                            ArrayList<String> check = new ArrayList<String>();
-//                            if (post.likes != null) {
-//                                for (Object value : post.likes.values()) {
-//                                    check.add(value.toString());
-//                                }
-//                                Boolean done = false;
-//                                for (int i = 0; i < check.size(); i++) {
-//                                    if (check.get(i).toString().equals(user.getUid())) {
-//                                        Toast.makeText(PostDetail.this, "Already liked this post", Toast.LENGTH_SHORT).show();
-//                                        done = true;
-//                                    }
-//                                }
-//                                    if (done = false) {
-//                                        int x = post.likes.size();
-//                                        txtViewLikeCount.setText("" + (x + 1));
-//                                        database.child("likes").push().setValue(user.getUid());
-//                                    }
-//                            } else {
-//                                txtViewLikeCount.setText("1");
-//                                database.child("likes").push().setValue(user.getUid());
-//                            }
-//                        } else {
-//                            Toast.makeText(PostDetail.this, "Please login to dislike post", Toast.LENGTH_SHORT).show();
-//                        }
                     }
 
                 });
@@ -318,7 +286,6 @@ public class PostDetail extends AppCompatActivity {
                                     }
                                     if (p.dislikes != null) {
                                         if (p.dislikes.containsKey(auth.getCurrentUser().getUid())) {
-                                            // Unstar the post and remove self from stars
                                             p.dislikeCount = p.dislikeCount - 1;
                                             p.dislikes.remove(auth.getCurrentUser().getUid());
 
@@ -338,7 +305,6 @@ public class PostDetail extends AppCompatActivity {
                                         new CustomTaskDislike().execute((Void[]) null);
                                     }
 
-                                    // Set value and report transaction success
                                     mutableData.setValue(p);
                                     return Transaction.success(mutableData);
                                 }
@@ -398,7 +364,6 @@ public class PostDetail extends AppCompatActivity {
                                                     p.comments.put(newComment.getKey(), true);
                                                 }
 
-                                                // Set value and report transaction success
                                                 mutableData.setValue(p);
                                                 return Transaction.success(mutableData);
                                             }
@@ -420,7 +385,6 @@ public class PostDetail extends AppCompatActivity {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-                                                    //HomeFragment.rvPost.smoothScrollToPosition(position);
                                                     Toast.makeText(PostDetail.this, "Successfully commented!", Toast.LENGTH_SHORT).show();
                                                     dialog.dismiss();
 
@@ -437,59 +401,6 @@ public class PostDetail extends AppCompatActivity {
                         } else {
                             Toast.makeText(PostDetail.this, "Please login to post comment!", Toast.LENGTH_SHORT).show();
                         }
-//                        if (auth.getCurrentUser() != null) {
-//                            AlertDialog.Builder builder = new AlertDialog.Builder(PostDetail.this);
-//                            View v = LayoutInflater.from(PostDetail.this).inflate(R.layout.post_comment_dialog, null);
-//                            final EditText txtComment = (EditText) v.findViewById(R.id.editTxtComments);
-//                            Button postComment = (Button) v.findViewById(R.id.btnPostComment);
-//
-//                            builder.setView(v);
-//                            final AlertDialog dialog = builder.create();
-//                            dialog.show();
-//
-//                            postComment.setOnClickListener(new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View view) {
-//                                    if (!txtComment.getText().toString().isEmpty()) {
-//
-//                                        final Calendar c = Calendar.getInstance();
-//                                        SimpleDateFormat sdf = new SimpleDateFormat("dd:MMMM:yyyy HH:mm:ss a");
-//                                        final String strDate = sdf.format(c.getTime());
-//                                        final Comment comment = new Comment();
-//
-//
-//                                        final DatabaseReference newComment = databaseComments.push();
-//
-//                                        comment.comment = txtComment.getText().toString();
-//                                        comment.date = strDate;
-//                                        comment.uid = post.uid;
-//                                        comment.name = post.name;
-//                                        comment.id = newComment.getKey();
-//
-//                                        newComment.setValue(comment).addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                            @Override
-//                                            public void onComplete(@NonNull Task<Void> task) {
-//                                                if (task.isSuccessful()) {
-//
-//                                                    Toast.makeText(PostDetail.this, "Successfully commented!", Toast.LENGTH_SHORT).show();
-//                                                    dialog.dismiss();
-//                                                    if (post.comments != null) {
-//                                                        txtViewCommentCount.setText("" + (post.comments.size() + 1));
-//                                                    } else {
-//                                                        txtViewCommentCount.setText("1");
-//                                                    }
-//
-//                                                }
-//                                            }
-//                                        });
-//
-//
-//                                    }
-//                                }
-//                            });
-//                        } else {
-//                            Toast.makeText(PostDetail.this, "Please login to post comment!", Toast.LENGTH_SHORT).show();
-//                        }
 
                     }
                 });
@@ -526,7 +437,6 @@ public class PostDetail extends AppCompatActivity {
                                         new CustomTaskFavourite().execute((Void[]) null);
                                     }
 
-                                    // Set value and report transaction success
                                     mutableData.setValue(u);
                                     return Transaction.success(mutableData);
                                 }
@@ -540,43 +450,6 @@ public class PostDetail extends AppCompatActivity {
                         } else {
                             Toast.makeText(PostDetail.this, "Please login to favourite post", Toast.LENGTH_SHORT).show();
                         }
-
-//                        if (auth.getCurrentUser() != null) {
-//                            final ArrayList<String> check = new ArrayList<String>();
-//                            databaseFavourite.addValueEventListener(new ValueEventListener() {
-//                                @Override
-//                                public void onDataChange(DataSnapshot dataSnapshot) {
-//                                    User user = dataSnapshot.getValue(User.class);
-//                                    if (user.favourite != null) {
-//                                        for (Object value : user.favourite.values()) {
-//                                            check.add(value.toString());
-//                                        }
-//                                    }
-//                                }
-//
-//                                @Override
-//                                public void onCancelled(DatabaseError databaseError) {
-//
-//                                }
-//                            });
-//
-//                            Boolean done = false;
-//                            for (int i = 0; i < check.size(); i++) {
-//                                if (check.get(i).toString().equals(post.id)) {
-//                                    Toast.makeText(PostDetail.this, "Already favourited this post", Toast.LENGTH_SHORT).show();
-//                                    done = true;
-//                                }
-//                            }
-//
-//                            if (done = false) {
-//                                databaseFavourite.child("favourite").push().setValue(post.id);
-//                                Toast.makeText(PostDetail.this, "You have favourited this post", Toast.LENGTH_SHORT).show();
-//
-//                            }
-//
-//                        } else {
-//                            Toast.makeText(PostDetail.this, "Please login to favourite this post", Toast.LENGTH_SHORT).show();
-//                        }
                     }
                 });
 
@@ -621,7 +494,6 @@ public class PostDetail extends AppCompatActivity {
     private class CustomTaskLike extends AsyncTask<Void, Void, Void> {
 
         protected Void doInBackground(Void... param) {
-            //Do some work
             return null;
         }
 
@@ -633,7 +505,6 @@ public class PostDetail extends AppCompatActivity {
     private class CustomTaskDislike extends AsyncTask<Void, Void, Void> {
 
         protected Void doInBackground(Void... param) {
-            //Do some work
             return null;
         }
 
@@ -645,7 +516,6 @@ public class PostDetail extends AppCompatActivity {
     private class CustomTaskFavourite extends AsyncTask<Void, Void, Void> {
 
         protected Void doInBackground(Void... param) {
-            //Do some work
             return null;
         }
 
@@ -657,7 +527,6 @@ public class PostDetail extends AppCompatActivity {
     private class CustomTaskUnFavourite extends AsyncTask<Void, Void, Void> {
 
         protected Void doInBackground(Void... param) {
-            //Do some work
             return null;
         }
 

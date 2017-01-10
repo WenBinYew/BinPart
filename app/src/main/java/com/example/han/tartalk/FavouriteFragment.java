@@ -21,10 +21,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-/**
- * Created by han on 26/11/2016.
- */
-
 public class FavouriteFragment extends android.support.v4.app.Fragment {
     private DatabaseReference databaseFavourite = FirebaseDatabase.getInstance().getReference().child("Users");
     private ArrayList<Post> postList = HomeFragment.postList;

@@ -78,15 +78,6 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         mAuth = FirebaseAuth.getInstance();
         btnLogout.setOnClickListener(this);
 
-//        if (mAuth.getCurrentUser()!=null){
-//
-//        }
-
-        //Toast.makeText(getActivity(),"user Email 1: " + user.getEmail(),Toast.LENGTH_SHORT).show();
-//        authListener = new FirebaseAuth.AuthStateListener() {
-//            @Override
-//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-        //Toast.makeText(getActivity(),"user Email 2: " + mAuth.hrentUser().getEmail(),Toast.LENGTH_SHORT).show();
         if (mAuth.getCurrentUser() == null) {
             LayoutInflater li = LayoutInflater.from(getActivity());
             View promptsView = li.inflate(R.layout.activity_login, null);
@@ -141,7 +132,6 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         if (mAuth.getCurrentUser() != null) {
 
             final TextView textViewPost = (TextView) view.findViewById(R.id.textViewPost);
-           //database = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
             database.child(mAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -169,26 +159,11 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
 
             });
 
-//            database.addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                   String name= dataSnapshot.child("Name").getValue().toString();
-//                    textViewNickname.setText(name);
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
-
 
 
         }
 
-        //Toast.makeText(getActivity(),"user Email 3: " + mAuth.getCurrentUser().getEmail(),Toast.LENGTH_SHORT).show();
-//            }
-//        };
+
 
 
         CustomListAdapter adapter = new CustomListAdapter(getActivity(), profile, icon);
@@ -196,7 +171,6 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         listViewProfile.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Toast.makeText(getActivity().getApplicationContext(),"Position get " + position, Toast.LENGTH_SHORT).show();
 
                 switch (position) {
                     case 0:
@@ -208,7 +182,6 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
                         getContext().startActivity(mypost);
 
 
-//                        startActivity(new Intent(getActivity(), MyHistoryActivity.class));
                         break;
                 }
             }
@@ -224,12 +197,10 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         String password = editTextPassword.getText().toString().trim();
 
         if (TextUtils.isEmpty(email)) {
-            //email is empty
             Toast.makeText(getActivity(), "Please enter email", Toast.LENGTH_SHORT).show();
             return;
         }
         if (TextUtils.isEmpty(password)) {
-            //password is empty
             Toast.makeText(getActivity(), "Please enter password", Toast.LENGTH_SHORT).show();
             return;
         }

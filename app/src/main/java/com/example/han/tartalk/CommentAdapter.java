@@ -33,14 +33,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
 
-/**
- * Created by han on 21/12/2016.
- */
 
 class CommentAdapter extends HFRecyclerViewAdapter<Comment, CommentAdapter.CommentViewHolder> {
 
     private DatabaseReference databaseComments = FirebaseDatabase.getInstance().getReference().child("Comments");
-    //public String postID;
     private static final String TAG = "Comment Adapter";
     private FirebaseAuth auth;
     private FirebaseUser user;
@@ -52,9 +48,6 @@ class CommentAdapter extends HFRecyclerViewAdapter<Comment, CommentAdapter.Comme
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
-        //databaseComments = FirebaseDatabase.getInstance().getReference().child("Comments");
-        //DatabaseReference databasePost = FirebaseDatabase.getInstance().getReference().child("Post");
-        //databaseComments = FirebaseDatabase.getInstance().getReference().child("Posts").child(postID).child("comments");
 
     }
 
@@ -62,9 +55,6 @@ class CommentAdapter extends HFRecyclerViewAdapter<Comment, CommentAdapter.Comme
     public void footerOnVisibleItem() {
     }
 
-//    public void setPostID(String id ){
-//        this.postID = id;
-//    }
 
     @Override
     public CommentViewHolder onCreateDataItemViewHolder(ViewGroup parent, int viewType) {
@@ -276,7 +266,6 @@ class CommentAdapter extends HFRecyclerViewAdapter<Comment, CommentAdapter.Comme
     private class CustomTaskLike extends AsyncTask<Void, Void, Void> {
 
         protected Void doInBackground(Void... param) {
-            //Do some work
             return null;
         }
 
@@ -288,7 +277,6 @@ class CommentAdapter extends HFRecyclerViewAdapter<Comment, CommentAdapter.Comme
     private class CustomTaskDislike extends AsyncTask<Void, Void, Void> {
 
         protected Void doInBackground(Void... param) {
-            //Do some work
             return null;
         }
 

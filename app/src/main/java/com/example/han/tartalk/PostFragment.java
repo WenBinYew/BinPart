@@ -84,9 +84,6 @@ public class PostFragment extends android.support.v4.app.Fragment {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
-//        authListener = new FirebaseAuth.AuthStateListener() {
-//            @Override
-//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
         if (auth.getCurrentUser() == null) {
             LayoutInflater li = LayoutInflater.from(getActivity());
             View promptsView = li.inflate(R.layout.activity_login, null);
@@ -121,7 +118,6 @@ public class PostFragment extends android.support.v4.app.Fragment {
 
                     chkLogin();
 
-
                 }
             });
             buttonCancel.setOnClickListener(new View.OnClickListener() {
@@ -137,18 +133,6 @@ public class PostFragment extends android.support.v4.app.Fragment {
             alertDialog.setView(promptsView);
             alertDialog.show();
 
-
-//                    alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                        public void onClick(final DialogInterface dialog, int id) {
-//                            chkLogin();
-//                        }
-//                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int id) {
-//                            startActivity(new Intent(getActivity(), MainActivity.class));
-//                        }
-//                    });
-//                    AlertDialog alertDialog = alertDialogBuilder.create();
-//                    alertDialog.show();
         } else {
             selectImage = (ImageButton) v.findViewById(R.id.imageButton);
             titleField = (EditText) v.findViewById(R.id.titleField);
@@ -171,7 +155,6 @@ public class PostFragment extends android.support.v4.app.Fragment {
             databaseImages = FirebaseDatabase.getInstance().getReference().child("Images");
             progress = new ProgressDialog(getActivity());
             users = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
-            //userPost = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("postID");
             selectImage.setOnClickListener(new View.OnClickListener() {
 
                 @Override
@@ -217,12 +200,10 @@ public class PostFragment extends android.support.v4.app.Fragment {
         String password = editTextPassword.getText().toString().trim();
 
         if (TextUtils.isEmpty(email)) {
-            //email is empty
             Toast.makeText(getActivity(), "Please enter email", Toast.LENGTH_SHORT).show();
             return;
         }
         if (TextUtils.isEmpty(password)) {
-            //password is empty
             Toast.makeText(getActivity(), "Please enter password", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -283,7 +264,6 @@ public class PostFragment extends android.support.v4.app.Fragment {
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         progress.dismiss();
-                                        //userPost.push().setValue(newPost.getKey());
                                         users.child("postID").push().setValue(newPost.getKey());
                                     }
                                 }
@@ -317,7 +297,6 @@ public class PostFragment extends android.support.v4.app.Fragment {
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
                                 progress.dismiss();
-                                //userPost.push().setValue(newPost.getKey());
                                 users.child("postID").push().setValue(newPost.getKey());
                             }
                         }
@@ -333,42 +312,6 @@ public class PostFragment extends android.support.v4.app.Fragment {
         }
 
 
-//        } else if (!TextUtils.isEmpty(title_val) && !TextUtils.isEmpty(desc_val)) {
-//
-//            Calendar c = Calendar.getInstance();
-//            SimpleDateFormat sdf = new SimpleDateFormat("dd:MMMM:yyyy HH:mm:ss a");
-//            final String strDate = sdf.format(c.getTime());
-//            final String user_id = auth.getCurrentUser().getUid();
-//            final DatabaseReference newPost = database.push();
-//
-//            users.addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    post = new Post(desc_val, strDate,"null", newPost.getKey(), dataSnapshot.child("Name").getValue().toString()
-//                            , title_val, user_id);
-//
-//                    newPost.setValue(post).addOnCompleteListener(new OnCompleteListener<Void>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<Void> task) {
-//                            if (task.isSuccessful()) {
-//                                userPost.push().setValue(newPost.getKey());
-//                                progress.dismiss();
-//                                HomeFragment fragment = new HomeFragment();
-//                                getFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
-//                                MainActivity.bottomBar.setDefaultTabPosition(0);
-//
-//                            }
-//                        }
-//                    });
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
-//
-//        }
         HomeFragment fragment = new HomeFragment();
         getFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
         MainActivity.bottomBar.selectTabAtPosition(0, true);
@@ -387,7 +330,6 @@ public class PostFragment extends android.support.v4.app.Fragment {
                     .resize(450, 450)
                     .centerCrop()
                     .into(selectImage);
-            //selectImage.setImageURI(imageUri);
         }
     }
 }

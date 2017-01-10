@@ -2,9 +2,7 @@ package com.example.han.tartalk;
 
 import android.support.v7.widget.helper.ItemTouchHelper;
 
-/**
- * Created by han on 03/01/2017.
- */
+
 
 public interface ItemTouchHelperViewHolder {
 

@@ -45,9 +45,6 @@ import java.util.Date;
 import java.util.HashMap;
 
 
-/**
- * Created by han on 21/12/2016.
- */
 
 class PostAdapterClean extends HFRecyclerViewAdapter<Post, PostAdapterClean.PostViewHolder> implements ItemTouchHelperAdapter {
     private DatabaseReference databasePosts = FirebaseDatabase.getInstance().getReference().child("Posts");
@@ -76,7 +73,6 @@ class PostAdapterClean extends HFRecyclerViewAdapter<Post, PostAdapterClean.Post
 
     @Override
     public PostViewHolder onCreateDataItemViewHolder(ViewGroup parent, int viewType) {
-        // LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_cardview_clean, parent, false);
 
         PostViewHolder itemViewHolder = new PostViewHolder(view);
@@ -86,7 +82,6 @@ class PostAdapterClean extends HFRecyclerViewAdapter<Post, PostAdapterClean.Post
 
     @Override
     public void onBindDataItemViewHolder(final PostViewHolder holder, final int position) {
-        // Post post = postList.get(position);
         holder.txtViewTitle.setText(getData().get(position).title);
         holder.txtViewContent.setText(getData().get(position).content);
 
@@ -131,11 +126,6 @@ class PostAdapterClean extends HFRecyclerViewAdapter<Post, PostAdapterClean.Post
             e.printStackTrace();
         }
 
-//        holder.txtViewLikeCount.setText("" + getData().get(position).likeCount);
-//        holder.txtViewDislikeCount.setText("" + getData().get(position).dislikeCount);
-//        holder.txtViewCommentCount.setText("" + getData().get(position).commentCount);
-
-
         holder.cvPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -145,271 +135,6 @@ class PostAdapterClean extends HFRecyclerViewAdapter<Post, PostAdapterClean.Post
 
             }
         });
-
-//        holder.btnComment.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (auth.getCurrentUser() != null) {
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-//                    View v = LayoutInflater.from(mContext).inflate(R.layout.post_comment_dialog, null);
-//                    final EditText txtComment = (EditText) v.findViewById(R.id.editTxtComments);
-//                    Button postComment = (Button) v.findViewById(R.id.btnPostComment);
-//
-//                    builder.setView(v);
-//                    final AlertDialog dialog = builder.create();
-//                    dialog.show();
-//
-//                    postComment.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View view) {
-//                            if (!txtComment.getText().toString().isEmpty()) {
-//
-//                                final Calendar c = Calendar.getInstance();
-//                                SimpleDateFormat sdf = new SimpleDateFormat("dd:MMMM:yyyy HH:mm:ss a");
-//                                final String strDate = sdf.format(c.getTime());
-//                                final Comment comment = new Comment();
-//
-//                                final DatabaseReference newComment = databaseComments.child(getData().get(position).id).push();
-//
-//                                databasePosts.child(getData().get(position).id).runTransaction(new Transaction.Handler() {
-//                                    @Override
-//                                    public Transaction.Result doTransaction(MutableData mutableData) {
-//                                        Post p = mutableData.getValue(Post.class);
-//                                        if (p == null) {
-//                                            return Transaction.success(mutableData);
-//                                        }
-//                                        if (p.comments != null) {
-//                                            p.commentCount = p.commentCount + 1;
-//                                            p.comments.put(newComment.getKey(), true);
-//                                        } else {
-//                                            p.comments = new HashMap<String, Boolean>();
-//                                            p.commentCount = p.commentCount + 1;
-//                                            p.comments.put(newComment.getKey() , true);
-//                                        }
-//
-//                                        // Set value and report transaction success
-//                                        mutableData.setValue(p);
-//                                        return Transaction.success(mutableData);
-//                                    }
-//
-//                                    @Override
-//                                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-//                                        Log.d(TAG, "postTransaction:onComplete:" + databaseError);
-//                                    }
-//                                });
-//
-//                                comment.comment = txtComment.getText().toString();
-//                                comment.date = strDate;
-//                                comment.uid = getData().get(position).uid;
-//                                comment.name = getData().get(position).name;
-//                                comment.id = newComment.getKey();
-//                                comment.postid = getData().get(position).id;
-//
-//                                newComment.setValue(comment).addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                    @Override
-//                                    public void onComplete(@NonNull Task<Void> task) {
-//                                        if (task.isSuccessful()) {
-//                                            //HomeFragment.rvPost.smoothScrollToPosition(position);
-//                                            Toast.makeText(mContext, "Successfully commented!", Toast.LENGTH_SHORT).show();
-//                                            dialog.dismiss();
-//
-//                                        }
-//                                    }
-//                                });
-//
-//
-//                            }
-//                        }
-//                    });
-//
-//
-//                } else {
-//                    Toast.makeText(mContext, "Please login to post comment!", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
-//
-//
-//        holder.btnLike.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View view) {
-//
-//                if (auth.getCurrentUser() != null) {
-//                    databasePosts.child(getData().get(position).id).runTransaction(new Transaction.Handler() {
-//                        @Override
-//                        public Transaction.Result doTransaction(MutableData mutableData) {
-//                            Post p = mutableData.getValue(Post.class);
-//                            if (p == null) {
-//
-//                                return Transaction.success(mutableData);
-//                            }
-//                            if (p.likes != null) {
-//                                if (p.likes.containsKey(auth.getCurrentUser().getUid())) {
-//                                    // Unstar the post and remove self from stars
-//                                    p.likeCount = p.likeCount - 1;
-//                                    p.likes.remove(auth.getCurrentUser().getUid());
-//
-//
-//                                } else {
-//                                    // Star the post and add self to stars
-//                                    p.likeCount = p.likeCount + 1;
-//                                    p.likes.put(auth.getCurrentUser().getUid(), true);
-//                                    new CustomTaskLike().execute((Void[]) null);
-//
-//                                }
-//                            } else {
-//                                p.likes = new HashMap<String, Boolean>();
-//                                p.likeCount = p.likeCount + 1;
-//                                p.likes.put(auth.getCurrentUser().getUid(), true);
-//                                new CustomTaskLike().execute((Void[]) null);
-//                            }
-//
-//                            // Set value and report transaction success
-//                            mutableData.setValue(p);
-//                            return Transaction.success(mutableData);
-//                        }
-//
-//                        @Override
-//                        public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-//                            Log.d(TAG, "postTransaction:onComplete:" + databaseError);
-//                        }
-//                    });
-//
-//
-//                } else {
-//                    Toast.makeText(mContext, "Please login to like post", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//
-//        });
-//
-//        holder.btnDislike.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//                if (auth.getCurrentUser() != null) {
-//                    databasePosts.child(getData().get(position).id).runTransaction(new Transaction.Handler() {
-//                        @Override
-//                        public Transaction.Result doTransaction(MutableData mutableData) {
-//                            Post p = mutableData.getValue(Post.class);
-//                            if (p == null) {
-//
-//                                return Transaction.success(mutableData);
-//                            }
-//                            if (p.dislikes != null) {
-//                                if (p.dislikes.containsKey(auth.getCurrentUser().getUid())) {
-//                                    // Unstar the post and remove self from stars
-//                                    p.dislikeCount = p.dislikeCount - 1;
-//                                    p.dislikes.remove(auth.getCurrentUser().getUid());
-//
-//                                } else {
-//                                    // Star the post and add self to stars
-//                                    p.dislikeCount = p.dislikeCount + 1;
-//                                    p.dislikes.put(auth.getCurrentUser().getUid(), true);
-//                                    new CustomTaskDislike().execute((Void[]) null);
-//
-//                                }
-//                            } else {
-//                                p.dislikes = new HashMap<String, Boolean>();
-//                                p.dislikeCount = p.dislikeCount + 1;
-//                                p.dislikes.put(auth.getCurrentUser().getUid(), true);
-//                                new CustomTaskDislike().execute((Void[]) null);
-//
-//                            }
-//
-//                            // Set value and report transaction success
-//                            mutableData.setValue(p);
-//                            return Transaction.success(mutableData);
-//                        }
-//
-//                        @Override
-//                        public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-//                            Log.d(TAG, "postTransaction:onComplete:" + databaseError);
-//                        }
-//                    });
-//
-//
-//                } else {
-//                    Toast.makeText(mContext, "Please login to dislike post", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
-//
-//        holder.btnFavourite.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (auth.getCurrentUser() != null) {
-//                    databaseFavourite.child(user.getUid()).runTransaction(new Transaction.Handler() {
-//                        @Override
-//                        public Transaction.Result doTransaction(MutableData mutableData) {
-//                            User u = mutableData.getValue(User.class);
-//                            if (u == null) {
-//
-//                                return Transaction.success(mutableData);
-//
-//                            }
-//
-//                            if (u.favourite != null) {
-//                                if (u.favourite.containsKey(getData().get(position).id)) {
-//                                    u.favourite.remove(getData().get(position).id);
-//                                    new CustomTaskUnFavourite().execute((Void[]) null);
-//
-//                                } else {
-//
-//                                    u.favourite.put((getData().get(position).id), true);
-//                                    new CustomTaskFavourite().execute((Void[]) null);
-//
-//                                }
-//                            } else {
-//                                u.favourite = new HashMap<String, Boolean>();
-//                                u.favourite.put((getData().get(position).id), true);
-//                                new CustomTaskFavourite().execute((Void[]) null);
-//                            }
-//
-//                            // Set value and report transaction success
-//                            mutableData.setValue(u);
-//                            return Transaction.success(mutableData);
-//                        }
-//
-//                        @Override
-//                        public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-//                            Log.d(TAG, "postTransaction:onComplete:" + databaseError);
-//                        }
-//                    });
-//
-//                } else {
-//                    Toast.makeText(mContext, "Please login to favourite post", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
-//
-//        holder.rlLike.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                holder.btnLike.performClick();
-//            }
-//        });
-//
-//        holder.rlDislike.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                holder.btnDislike.performClick();
-//            }
-//        });
-//
-//        holder.rlComment.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                holder.btnComment.performClick();
-//            }
-//        });
-//
-//
-//        holder.rlFavourite.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                holder.btnFavourite.performClick();
-//            }
-//        });
 
     }
 
@@ -443,7 +168,6 @@ class PostAdapterClean extends HFRecyclerViewAdapter<Post, PostAdapterClean.Post
 
                     public void onClick(DialogInterface dialog, int which) {
 
-                        //Toast.makeText(mContext, getData().get(position).content, Toast.LENGTH_SHORT).show();
 
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
                         com.google.firebase.database.Query removeQuery = ref.child("Posts").orderByChild("id").equalTo(getData().get(position).id);
@@ -473,7 +197,6 @@ class PostAdapterClean extends HFRecyclerViewAdapter<Post, PostAdapterClean.Post
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        // Do nothing
                         dialog.dismiss();
                         notifyDataSetChanged();
                     }
@@ -485,24 +208,20 @@ class PostAdapterClean extends HFRecyclerViewAdapter<Post, PostAdapterClean.Post
             } else {
 
                 notifyDataSetChanged();
-                //notifyItemRemoved(position);
                 Toast.makeText(mContext, "Not authorized to delete", Toast.LENGTH_SHORT).show();
             }
         } else {
             notifyDataSetChanged();
-            //notifyItemRemoved(position);
             Toast.makeText(mContext, "Not authorized to delete", Toast.LENGTH_SHORT).show();
         }
 
     }
 
 
-    //View Holder class
     public static class PostViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
 
         public CardView cvPost;
         public RecyclerView rvPost;
-        public TextView txtViewID;
         public TextView txtViewContent;
         public TextView txtViewDate;
         public TextView txtViewPostName;
@@ -517,24 +236,12 @@ class PostAdapterClean extends HFRecyclerViewAdapter<Post, PostAdapterClean.Post
         public Button btnDislike;
         public Button btnFavourite;
 
-        public RelativeLayout rlComment;
-        public RelativeLayout rlLike;
-        public RelativeLayout rlDislike;
-        public RelativeLayout rlFavourite;
-
-
-//        public TextView textViewPostNickname;
-//        public TextView textViewPostDate;
-//        public ImageView imageViewPostImage;
-//        public TextView textViewUpVote;
-//        public TextView textViewContent;
 
         public PostViewHolder(View itemView) {
             super(itemView);
             cvPost = (CardView) itemView.findViewById(R.id.cvPostClean);
             rvPost = (RecyclerView) itemView.findViewById(R.id.rvPost);
             txtViewContent = (TextView) itemView.findViewById(R.id.txtViewContent);
-            //txtViewID = (TextView) itemView.findViewById(R.id.txtViewPostID);
             txtViewDate = (TextView) itemView.findViewById(R.id.txtViewPostDate);
             txtViewPostName = (TextView) itemView.findViewById(R.id.txtViewPostName);
             txtViewTitle = (TextView) itemView.findViewById(R.id.txtViewTitle);
@@ -546,31 +253,16 @@ class PostAdapterClean extends HFRecyclerViewAdapter<Post, PostAdapterClean.Post
             btnLike = (Button) itemView.findViewById(R.id.btnLike);
             btnDislike = (Button) itemView.findViewById(R.id.btnDisike);
             btnFavourite = (Button) itemView.findViewById(R.id.btnFavourite);
-//
-//            rlFavourite = (RelativeLayout) itemView.findViewById(R.id.btntoClickFavourite);
-//            rlDislike = (RelativeLayout) itemView.findViewById(R.id.btntoClickDislike);
-//            rlLike = (RelativeLayout) itemView.findViewById(R.id.btntoClickLike);
-//            rlComment = (RelativeLayout) itemView.findViewById(R.id.btntoClickComment);
-
-//            textViewPostNickname = (TextView) itemView.findViewById(R.id.textViewPostNickname);
-//            textViewPostDate = (TextView) itemView.findViewById(R.id.textViewPostDate);
-//            textViewUpVote = (TextView) itemView.findViewById(R.id.textViewVote);
-//            textViewContent = (TextView) itemView.findViewById(R.id.textViewContent);
-//            imageViewPostImage = (ImageView) itemView.findViewById(R.id.imageViewPostImage);
-
-
         }
 
         @Override
         public void onItemSelected() {
-            //Toast.makeText(itemView.getContext(), "Onitem selected", Toast.LENGTH_SHORT).show();
             itemView.setBackgroundColor(Color.rgb(245, 245, 245));
 
         }
 
         @Override
         public void onItemClear() {
-            //Toast.makeText(itemView.getContext(), "Onitem clear", Toast.LENGTH_SHORT).show();
             itemView.setBackgroundColor(Color.rgb(245, 245, 245));
         }
     }

@@ -45,9 +45,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 
-/**
- * Created by han on 21/12/2016.
- */
+
 
 class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder> implements ItemTouchHelperAdapter {
     private DatabaseReference databasePosts = FirebaseDatabase.getInstance().getReference().child("Posts");
@@ -76,7 +74,6 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
 
     @Override
     public PostViewHolder onCreateDataItemViewHolder(ViewGroup parent, int viewType) {
-        // LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_cardview, parent, false);
 
         PostViewHolder itemViewHolder = new PostViewHolder(view);
@@ -187,7 +184,6 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
                                             p.comments.put(newComment.getKey() , true);
                                         }
 
-                                        // Set value and report transaction success
                                         mutableData.setValue(p);
                                         return Transaction.success(mutableData);
                                     }
@@ -209,7 +205,6 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            //HomeFragment.rvPost.smoothScrollToPosition(position);
                                             Toast.makeText(mContext, "Successfully commented!", Toast.LENGTH_SHORT).show();
                                             dialog.dismiss();
 
@@ -244,13 +239,11 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
                             }
                             if (p.likes != null) {
                                 if (p.likes.containsKey(auth.getCurrentUser().getUid())) {
-                                    // Unstar the post and remove self from stars
                                     p.likeCount = p.likeCount - 1;
                                     p.likes.remove(auth.getCurrentUser().getUid());
 
 
                                 } else {
-                                    // Star the post and add self to stars
                                     p.likeCount = p.likeCount + 1;
                                     p.likes.put(auth.getCurrentUser().getUid(), true);
                                     new CustomTaskLike().execute((Void[]) null);
@@ -263,7 +256,6 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
                                 new CustomTaskLike().execute((Void[]) null);
                             }
 
-                            // Set value and report transaction success
                             mutableData.setValue(p);
                             return Transaction.success(mutableData);
                         }
@@ -297,12 +289,10 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
                             }
                             if (p.dislikes != null) {
                                 if (p.dislikes.containsKey(auth.getCurrentUser().getUid())) {
-                                    // Unstar the post and remove self from stars
                                     p.dislikeCount = p.dislikeCount - 1;
                                     p.dislikes.remove(auth.getCurrentUser().getUid());
 
                                 } else {
-                                    // Star the post and add self to stars
                                     p.dislikeCount = p.dislikeCount + 1;
                                     p.dislikes.put(auth.getCurrentUser().getUid(), true);
                                     new CustomTaskDislike().execute((Void[]) null);
@@ -316,7 +306,6 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
 
                             }
 
-                            // Set value and report transaction success
                             mutableData.setValue(p);
                             return Transaction.success(mutableData);
                         }
@@ -365,7 +354,6 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
                                 new CustomTaskFavourite().execute((Void[]) null);
                             }
 
-                            // Set value and report transaction success
                             mutableData.setValue(u);
                             return Transaction.success(mutableData);
                         }
@@ -443,7 +431,6 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
 
                     public void onClick(DialogInterface dialog, int which) {
 
-                        //Toast.makeText(mContext, getData().get(position).content, Toast.LENGTH_SHORT).show();
 
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
                         com.google.firebase.database.Query removeQuery = ref.child("Posts").orderByChild("id").equalTo(getData().get(position).id);
@@ -473,7 +460,6 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        // Do nothing
                         dialog.dismiss();
                         notifyDataSetChanged();
                     }
@@ -485,19 +471,16 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
             } else {
 
                 notifyDataSetChanged();
-                //notifyItemRemoved(position);
                 Toast.makeText(mContext, "Not authorized to delete", Toast.LENGTH_SHORT).show();
             }
         } else {
             notifyDataSetChanged();
-            //notifyItemRemoved(position);
             Toast.makeText(mContext, "Not authorized to delete", Toast.LENGTH_SHORT).show();
         }
 
     }
 
 
-    //View Holder class
     public static class PostViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
 
         public CardView cvPost;
@@ -523,11 +506,6 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
         public RelativeLayout rlFavourite;
 
 
-//        public TextView textViewPostNickname;
-//        public TextView textViewPostDate;
-//        public ImageView imageViewPostImage;
-//        public TextView textViewUpVote;
-//        public TextView textViewContent;
 
         public PostViewHolder(View itemView) {
             super(itemView);
@@ -552,25 +530,17 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
             rlLike = (RelativeLayout) itemView.findViewById(R.id.btntoClickLike);
             rlComment = (RelativeLayout) itemView.findViewById(R.id.btntoClickComment);
 
-//            textViewPostNickname = (TextView) itemView.findViewById(R.id.textViewPostNickname);
-//            textViewPostDate = (TextView) itemView.findViewById(R.id.textViewPostDate);
-//            textViewUpVote = (TextView) itemView.findViewById(R.id.textViewVote);
-//            textViewContent = (TextView) itemView.findViewById(R.id.textViewContent);
-//            imageViewPostImage = (ImageView) itemView.findViewById(R.id.imageViewPostImage);
-
 
         }
 
         @Override
         public void onItemSelected() {
-            //Toast.makeText(itemView.getContext(), "Onitem selected", Toast.LENGTH_SHORT).show();
             itemView.setBackgroundColor(Color.rgb(245, 245, 245));
 
         }
 
         @Override
         public void onItemClear() {
-            //Toast.makeText(itemView.getContext(), "Onitem clear", Toast.LENGTH_SHORT).show();
             itemView.setBackgroundColor(Color.rgb(245, 245, 245));
         }
     }
@@ -601,7 +571,6 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
     private class CustomTaskLike extends AsyncTask<Void, Void, Void> {
 
         protected Void doInBackground(Void... param) {
-            //Do some work
             return null;
         }
 
@@ -613,7 +582,6 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
     private class CustomTaskDislike extends AsyncTask<Void, Void, Void> {
 
         protected Void doInBackground(Void... param) {
-            //Do some work
             return null;
         }
 
@@ -625,7 +593,6 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
     private class CustomTaskFavourite extends AsyncTask<Void, Void, Void> {
 
         protected Void doInBackground(Void... param) {
-            //Do some work
             return null;
         }
 
@@ -637,7 +604,6 @@ class PostAdapter extends HFRecyclerViewAdapter<Post, PostAdapter.PostViewHolder
     private class CustomTaskUnFavourite extends AsyncTask<Void, Void, Void> {
 
         protected Void doInBackground(Void... param) {
-            //Do some work
             return null;
         }
 

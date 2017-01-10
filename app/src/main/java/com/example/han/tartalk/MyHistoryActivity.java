@@ -95,22 +95,6 @@ public class MyHistoryActivity extends AppCompatActivity {
 
         mDatabase.addValueEventListener(eventListener);
 
-//        mDatabase.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//                for (Object value : dataSnapshot.getChildren()) {
-//                    postIDList.add(value.toString());
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-
         mDatabase.removeEventListener(eventListener);
 
 
@@ -122,9 +106,6 @@ public class MyHistoryActivity extends AppCompatActivity {
                     final Post post = ds.getValue(Post.class);
                     postList.add(post);
                 }
-
-//                final Post post = dataSnapshot.getValue(Post.class);
-//                postList.add(post);
             }
 
             @Override
@@ -144,76 +125,6 @@ public class MyHistoryActivity extends AppCompatActivity {
 
 
     }
-
-//    private void fetchData(DataSnapshot dataSnapShot) {
-//
-//
-//
-//        pDatabase.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//                for(DataSnapshot ds : dataSnapshot.getChildren()){
-//                    final Post post = ds.getValue(Post.class);
-//                    postList.add(post);
-//                }
-//
-////                final Post post = dataSnapshot.getValue(Post.class);
-////                postList.add(post);
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-//
-//
-//        for (int i = 0; i < postList.size(); i++) {
-//            for (int x = 0; x < postIDList.size(); x++) {
-//                if (postList.get(i).id.toString().equals(postIDList.get(x).toString())) {
-//                    postListFinal.add(postList.get(i));
-//                }
-//
-//            }
-//        }
-//
-//    }
-//
-//    public void findData() {
-//
-//
-//        pDatabase.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//                for(DataSnapshot ds : dataSnapshot.getChildren()){
-//                    final Post post = ds.getValue(Post.class);
-//                    postList.add(post);
-//                }
-//
-////                final Post post = dataSnapshot.getValue(Post.class);
-////                postList.add(post);
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-//
-//
-//        for (int i = 0; i < postList.size(); i++) {
-//            for (int x = 0; x < postIDList.size(); x++) {
-//                if (postList.get(i).id.toString().equals(postIDList.get(x).toString())) {
-//                    postListFinal.add(postList.get(i));
-//                }
-//
-//            }
-//        }
-//
-//
-//    }
 
 
     public boolean onOptionsItemSelected(MenuItem item) {

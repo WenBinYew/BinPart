@@ -102,7 +102,6 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
             return;
         }
         if (TextUtils.isEmpty(newPassword)) {
-            //password is empty
             Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -110,8 +109,6 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
             Toast.makeText(this, "The password are not consistent. Please try again.", Toast.LENGTH_SHORT).show();
             return;
         }
-//        AuthCredential credential = EmailAuthProvider
-//                .getCredential(firebaseAuth.getCurrentUser().getEmail(),newPassword);
 
         user.updatePassword(newPassword).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -125,7 +122,6 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
 
                     }
                 });
-        //Toast.makeText(getApplicationContext(), "Fail!!", Toast.LENGTH_SHORT).show();
     }
 
     public void chkPassword() {
@@ -135,7 +131,6 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
         progressDialog.show();
         final String oldPassword = editTextOldPassword.getText().toString();
         if(TextUtils.isEmpty(oldPassword)){
-            //password is empty
             Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();
             progressDialog.dismiss();
             return ;
@@ -150,8 +145,6 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
                 } else {
                     progressDialog.dismiss();
                     Toast.makeText(ChangePasswordActivity.this, "Password incorrect. ", Toast.LENGTH_SHORT).show();
-//                    finish();
-//                    startActivity(new Intent(getApplicationContext(), ChangePasswordActivity.class));
 
                 }
             }

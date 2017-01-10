@@ -5,9 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-/**
- * Created by han on 22/12/2016.
- */
 
 public abstract class HFRecyclerViewAdapter<T, VH extends RecyclerView.ViewHolder> extends BaseRecyclerViewAdapter<T> {
 

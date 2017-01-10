@@ -40,7 +40,6 @@ public class HomeFragment extends android.support.v4.app.Fragment {
     public static ArrayList<Post> postList = new ArrayList<Post>();
     private DatabaseReference database;
 
-    //private DatabaseReference databaseComments;
     private static final String TAG = "HomeFragment";
     private ItemTouchHelper mItemTouchHelper;
     private PostAdapter adapter;
@@ -115,36 +114,21 @@ public class HomeFragment extends android.support.v4.app.Fragment {
                 LinearLayoutManager layoutManager = ((LinearLayoutManager) rvPost.getLayoutManager());
                 int firstVisiblePosition = layoutManager.findFirstCompletelyVisibleItemPosition();
 
-                // Toast.makeText(getContext(), ""+firstVisiblePosition , Toast.LENGTH_SHORT).show();
                 adapter = new PostAdapter(getContext());
                 adapter.setData(postList);
                 rvPost.setAdapter(adapter);
-//                if(firstVisiblePosition != 0){
-//                    rvPost.scrollToPosition(firstVisiblePosition);
-//                }else{
-//                    rvPost.scrollToPosition(0);
-//                }
-//
+
                 rvPost.scrollToPosition(firstVisiblePosition);
                 swipeRefresh.setRefreshing(false);
                 mElasticDownloadView.setVisibility(View.INVISIBLE);
 
 
-//                fetchData(dataSnapshot);
-//                PostAdapter adapter = new PostAdapter(getContext());
-//
-//
-//                rvPost.setAdapter(adapter);
-//                adapter.setData(postList);
-//                swipeRefresh.setRefreshing(false);
-//                mElasticDownloadView.setVisibility(View.INVISIBLE);
 
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                // [START_EXCLUDE]
 
             }
         });

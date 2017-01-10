@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * Created by han on 21/12/2016.
- */
 
 public class Post implements Serializable {
 
